@@ -1,5 +1,5 @@
 functions{
-  int log_Z_bounding(real log_lambda, real nu, int M, real eps) {
+  int log_Z_iterations_bp(real log_lambda, real nu, int M, real eps) {
     real log_Z;
     int k = 2;
     real leps = log(eps);
