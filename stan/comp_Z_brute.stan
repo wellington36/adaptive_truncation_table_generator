@@ -63,6 +63,8 @@ functions {
     }
     log_Z = log_sum_exp(log_Z_terms[1:k]);
     
+    print("Z:", exp(log_Z));
+    
     return log_Z;
   }
 }
