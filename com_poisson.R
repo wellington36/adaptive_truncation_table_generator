@@ -8,12 +8,17 @@ expose_stan_functions("stan/comp_Z_brms_fixed.stan")
 
 mu <- c(10, 100, 1000, 10000)
 nu <- c(0.1, 0.01, 0.001, 0.0001)
-M <- c(10^3, 10^4, 10^5, 3*10^5) # only for the brute (10^6 for bounding)
 lambda <- mu^(nu)
+
+# M only for the brute (10^6 for bounding)
+M <- c(10^4, 10^4, 10^5, 3*10^5) # test
+#M <- c(10^4, 10^5, 10^6, 10^6)  # medium
+#M <- c(10^6, 10^6, 10^6, 10^6)  # final version
+
 
 brute_lessbits_error <- numeric(length(lambda))
 for (i in seq_along(lambda)) {
-  brute_lessbits_error[i] <- log_Z_iterations_bp(log(lambda[i]), nu[i], M[i], 2^-52*10^6)
+  brute_lessbits_error[i] <- log_Z_iterations_brute(log(lambda[i]), nu[i], M[i], 2^-52*10^6)
 }
 
 bounding_lessbits_error <- numeric(length(lambda))
@@ -23,7 +28,7 @@ for (i in seq_along(lambda)) {
 
 brute_64bits_error <- numeric(length(lambda))
 for (i in seq_along(lambda)) {
-  brute_64bits_error[i] <- log_Z_iterations_bp(log(lambda[i]), nu[i], M[i], 2^-52)
+  brute_64bits_error[i] <- log_Z_iterations_brute(log(lambda[i]), nu[i], M[i], 2^-52)
 }
 
 bounding_64bits_error <- numeric(length(lambda))
