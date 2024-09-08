@@ -1,6 +1,7 @@
 # Adaptive Truncation Table Generator
 
 - `com_poisson.R` generate:
-![image](https://github.com/user-attachments/assets/1b6c5148-4d3a-4d98-859e-782f385859b4)
+![image](https://github.com/user-attachments/assets/f322c6ab-8290-478e-be21-1095ef6d2854)
+
 
 
