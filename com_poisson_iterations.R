@@ -39,8 +39,6 @@ for (i in seq_along(lambda)) {
 library_COMPoissonReg <- numeric(length(lambda))
 for (i in seq_along(lambda)) {
   library_COMPoissonReg[i] <- abs(exp(log_diff_exp(log_Z_brute(log(lambda[i]), nu[i], M[i]), -1*dcmp(0, lambda[i], nu[i], log = TRUE))))
-  print(exp(-1*dcmp(0, lambda[i], nu[i], log = TRUE)))
-  print(exp(log_Z_brute(log(lambda[i]), nu[i], M[i])))
 }
 
 library_brms <- numeric(length(lambda))
