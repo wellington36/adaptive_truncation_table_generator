@@ -50,6 +50,6 @@ functions{
 
     log_Z = log_sum_exp(log_Z_terms[1:k]);
   
-    return log_sum_exp([log_Z, log(exp(log_Z_terms[k])/2 * (1 + pow(1 - exp(log_Z_terms[k] - log_Z_terms[k-1]), -1)))]);
+    return log_sum_exp([log_Z, log_Z_terms[k] + log(0.5 - 0.5/expm1(log_Z_terms[k] - log_Z_terms[k-1]))]);
   }
 }
