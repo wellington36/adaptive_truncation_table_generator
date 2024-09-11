@@ -17,7 +17,7 @@ functions{
     
     log_Z_terms[1] = 0;
     log_Z_terms[2] = log_lambda;
-    while (log(exp(log_Z_terms[k]) * abs(1 - pow(1 - exp(log_Z_terms[k])/exp(log_Z_terms[k-1]), -1))) >= log(2) + leps && k < M) {
+    while (log_Z_terms[k] + log(abs(1 + 1/expm1(log_Z_terms[k] - log_Z_terms[k-1]))) >= log(2) + leps && k < M) {
       k += 1;
       log_Z_terms[k] = (k - 1) * log_lambda - nu * lgamma(k);
     }
@@ -43,7 +43,7 @@ functions{
     
     log_Z_terms[1] = 0;
     log_Z_terms[2] = log_lambda;
-    while (log(exp(log_Z_terms[k]) * abs(1 - pow(1 - exp(log_Z_terms[k] - log_Z_terms[k-1]), -1))) >= log(2) + leps && k < M) {
+    while (log_Z_terms[k] + log(abs(1 + 1/expm1(log_Z_terms[k] - log_Z_terms[k-1]))) >= log(2) + leps && k < M) {
       k += 1;
       log_Z_terms[k] = (k - 1) * log_lambda - nu * lgamma(k);
     }
