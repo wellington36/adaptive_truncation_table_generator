@@ -1,6 +1,5 @@
-sandbox.R
+src/__pycache__
+utils/__pycache__
+__pycache__
 
-.Rproj.user
-.Rhistory
-.RData
-.Ruserdata
+sandbox.py

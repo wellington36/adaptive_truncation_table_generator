@@ -1,5 +1,5 @@
 from mpmath import mp, mpf, exp, log, expm1, fabs
-from utils import *
+from utils.utils import *
 from math import lgamma
 import mpmath
 
@@ -64,14 +64,14 @@ def log_Z_value_bp(log_lambda: float, nu: float, M: int, eps: float):
 
     return (k-1, logsumexp([log_Z, log_Z_terms[k] + log(0.5 - 0.5/expm1(log_Z_terms[k] - log_Z_terms[k-1]))]))
 
-mp.dps = 400
+mp.dps = 200
 
 mu = [mpf(10), mpf(100), mpf(1000), mpf(10000)]
 nu = [mpf("0.1"), mpf("0.01"), mpf("0.001"), mpf("0.0001")]
 lamb = [mu[i]**nu[i] for i in range(0,4)]
-M = 3 * 10**5
+M = 10**5
 
-for j in [8, 7, 6, 5, 4, 3, 2, 1, 0]:
+for j in [8, 7, 6, 5]:
     eps = mpf(2**(-52)) * 10**j
 
     for i in range(0, 4):
