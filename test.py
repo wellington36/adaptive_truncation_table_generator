@@ -1,4 +1,5 @@
 from src.bounding_pairs_mp import bounding_pairs_mp
+from src.brute_mp import brute_mp
 from mpmath import mp, mpf, log
 from math import lgamma
 
@@ -27,3 +28,4 @@ if __name__ == "__main__":
     theta = (log(lamb), nu)
     
     print(bounding_pairs_mp(f, theta, 10**4, mpf(0), eps=mpf(2)**mpf(-52), initial_k=1))
+    print(brute_mp(f, theta, 10**4, 1))
