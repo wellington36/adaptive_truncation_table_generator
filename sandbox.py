@@ -4,19 +4,6 @@ from math import lgamma
 import mpmath
 
 
-### utils
-def logsumexp(a):
-    with mp.extradps(10):
-        return mp.log(mp.fsum([mp.exp(ai) for ai in a]))
-
-def log_diff_exp(a, b):
-    if b > a:
-        a, b = b, a
-
-    result = a + log(1 - exp(b - a))
-
-    return result
-
 ### functions
 def log_Z_brute(log_lambda: float, nu: float, M: int):
     k = 2
@@ -78,7 +65,7 @@ for j in [8, 7, 6, 5]:
         brute_Z = log_Z_brute(log(lamb[i]), nu[i], M)
         (bounding_k, bounding_Z) = log_Z_value_bp(log(lamb[i]), nu[i], M, eps)
     
-        error = mpmath.nstr(abs(exp(log_diff_exp(brute_Z, bounding_Z))), n=5, strip_zeros=False)
+        error = mpmath.nstr(abs(exp(logdiffexp(brute_Z, bounding_Z))), n=5, strip_zeros=False)
         str_eps = mpmath.nstr(eps, n=2, strip_zeros=False)
 
         print(f"eps = {str_eps} | mu = {mu[i]}      | nu = {nu[i]}      | error = {error}       | k = {bounding_k}")
