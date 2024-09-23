@@ -26,5 +26,4 @@ if __name__ == "__main__":
 
     theta = (log(lamb), nu)
     
-    print("Hello, world!")
     print(bounding_pairs_mp(f, theta, 10**4, mpf(0), eps=mpf(2)**mpf(-52), initial_k=1))

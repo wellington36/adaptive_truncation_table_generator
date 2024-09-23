@@ -58,7 +58,7 @@ nu = [mpf("0.1"), mpf("0.01"), mpf("0.001"), mpf("0.0001")]
 lamb = [mu[i]**nu[i] for i in range(0,4)]
 M = 10**5
 
-for j in [8, 7, 6, 5]:
+for j in [0]:
     eps = mpf(2**(-52)) * 10**j
 
     for i in range(0, 4):
@@ -67,6 +67,8 @@ for j in [8, 7, 6, 5]:
     
         error = mpmath.nstr(abs(exp(logdiffexp(brute_Z, bounding_Z))), n=5, strip_zeros=False)
         str_eps = mpmath.nstr(eps, n=2, strip_zeros=False)
+
+        print(bounding_Z)
 
         print(f"eps = {str_eps} | mu = {mu[i]}      | nu = {nu[i]}      | error = {error}       | k = {bounding_k}")
 
