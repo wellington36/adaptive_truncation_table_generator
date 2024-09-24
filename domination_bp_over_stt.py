@@ -19,7 +19,7 @@ def f(a: float, n: int):
 if __name__ == "__main__":
     mp.dps = 200
 
-    a = [mpf(100), mpf(10), mpf(2), mpf('1.1'), mpf('1.01'), mpf('1.001'), mpf('1.0001'), mpf('1.00001')]
+    a = [mpf(100), mpf(10), mpf(2), mpf('1.1'), mpf('1.01'), mpf('1.001')]
     L = [1/x for x in a]
     M = [3*10**6 for _ in range(len(a))]
 
