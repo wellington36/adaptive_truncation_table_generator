@@ -26,7 +26,7 @@ def f(theta: tuple, k: int):
     elif (k == 2):
         return theta[0]
     else:
-        return (k-1) * theta[0] - theta[1] * lgamma(k)
+        return (mpf(k)-1) * theta[0] - theta[1] * lgamma(mpf(k))
 
 
 if __name__ == "__main__":
