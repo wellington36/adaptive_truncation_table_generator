@@ -26,3 +26,15 @@ Run (check if auxiliary libraries are installed):
 python comp_Z_errors.py
 ```
 ![image](https://github.com/user-attachments/assets/abc0e82d-6409-42d2-ac67-6e5faf0aae63)
+
+- `domination_bp_over_stt.py`, has dependency:
+  - `src/bounding_pairs_mp.py`: The Bounding pairs approach with mpmath structure;
+  - `src/sum_to_threshold_mp.py`: The Sum-to-threshold approach with mpmath structure;
+
+Run:
+
+```bash
+python domination_bp_over_stt.py
+```
+
+![image](https://github.com/user-attachments/assets/a94dd0a6-1b64-4c61-bfac-cf370c504c58)
