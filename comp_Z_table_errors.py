@@ -25,7 +25,7 @@ def f(theta: tuple, k: int):
 
 
 if __name__ == "__main__":
-    mp.dps = 200
+    mp.dps = 400
 
     mu = [mpf(10), mpf(100), mpf(1000), mpf(10000)]
     nu = [mpf("0.1"), mpf("0.01"), mpf("0.001"), mpf("0.0001")]
@@ -38,19 +38,21 @@ if __name__ == "__main__":
     error = mpf(2)**mpf(-52) * 10**6
     error_minus_10 = []
     for i in range(len(mu)):
-        bp_iter = bounding_pairs_mp(f, (loglamb[i], nu[i]), M[i], mpf(0), error, initial_k=1)[0]
-        sequential_iter = sequential_mp(f, (loglamb[i],nu[i]), M[i], error, initial_k=1)[0]
+        brute_value = brute_mp(f, (loglamb[i], nu[i]), M[i], initial_k=1)[1]
+        bp_iter = bounding_pairs_mp(f, (loglamb[i], nu[i]), M[i], mpf(0), error, initial_k=1)[1]
+        sequential_iter = sequential_mp(f, (loglamb[i],nu[i]), M[i], error, initial_k=1)[1]
 
-        error_minus_10.append([sequential_iter, bp_iter])
+        error_minus_10.append([exp(logdiffexp(sequential_iter, brute_value)), exp(logdiffexp(bp_iter, brute_value))])
 
     # 2.2x10^-16
     error = mpf(2)**mpf(-52)
     error_minus_16 = []
     for i in range(len(mu)):
-        bp_iter = bounding_pairs_mp(f, (loglamb[i], nu[i]), M[i], mpf(0), error, initial_k=1)[0]
-        sequential_iter = sequential_mp(f, (loglamb[i],nu[i]), M[i], error, initial_k=1)[0]
+        brute_value = brute_mp(f, (loglamb[i], nu[i]), M[i], initial_k=1)[1]
+        bp_iter = bounding_pairs_mp(f, (loglamb[i], nu[i]), M[i], mpf(0), error, initial_k=1)[1]
+        sequential_iter = sequential_mp(f, (loglamb[i],nu[i]), M[i], error, initial_k=1)[1]
 
-        error_minus_16.append([sequential_iter, bp_iter])
+        error_minus_16.append([exp(logdiffexp(sequential_iter, brute_value)), exp(logdiffexp(bp_iter, brute_value))])
     
     # Libraries
     comp_reg = importr('COMPoissonReg')
