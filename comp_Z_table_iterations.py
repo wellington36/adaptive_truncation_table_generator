@@ -1,12 +1,13 @@
 from src.bounding_pairs_mp import bounding_pairs_mp
 from src.sequential_mp import sequential_mp
 from src.brute_mp import brute_mp
-from tabulate import tabulate
-from mpmath import mp, mpf, log, exp
-from math import lgamma
+
 from rpy2.robjects.packages import importr
+from mpmath import mp, mpf, log, exp
 from utils.utils import logdiffexp
 from cmdstanpy import CmdStanModel
+from tabulate import tabulate
+from math import lgamma
 import math
 
 
