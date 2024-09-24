@@ -4,4 +4,4 @@ __pycache__
 
 sandbox.py
 
-stan/comp_Z_brms_fidex
+stan/comp_Z_brms_fidex.cpp*
