@@ -6,6 +6,8 @@ from mpmath import mp, mpf, log, exp
 from math import lgamma
 from rpy2.robjects.packages import importr
 from utils.utils import logdiffexp
+from cmdstanpy import CmdStanModel
+import math
 
 
 def f(theta: tuple, k: int):
@@ -56,6 +58,7 @@ if __name__ == "__main__":
     
     # Libraries
     comp_reg = importr('COMPoissonReg')
+    model = CmdStanModel(stan_file='stan/comp_Z_brms_fixed.stan')
 
     def dcmp_in_log_scale(x, lambda_, nu):
         # Call the dcmp function with log=TRUE in R
@@ -65,16 +68,25 @@ if __name__ == "__main__":
     libraries = []
     for i in range(len(mu)):
         brute_value = brute_mp(f, (loglamb[i], nu[i]), M[i], initial_k=1)[1]
+
+        fit = model.sample(data={'loglambda': float(math.log(mu[i])), 'nu': float(nu[i])},
+                           fixed_param = True,
+                           sig_figs = 18,
+                           iter_sampling = 1,
+                           adapt_engaged = False,
+                           chains = 1
+        )
+        brms = fit.stan_variable('result')[0]
         dcmp = log(list(comp_reg.dcmp(0, float(lamb[i]), float(nu[i])))[0])
 
-        libraries.append([abs(exp(logdiffexp(brute_value, -1*mpf(dcmp))))])
+        libraries.append([exp(logdiffexp(brute_value, brms)), exp(logdiffexp(brute_value, -1*mpf(dcmp)))])
 
     
     # Organize in a table
     data = []
     for idx, (a, b, c) in enumerate(zip(error_minus_10, error_minus_16, libraries), start=1):
-        data.append([f"mu={10**idx} | nu={10**-idx}", a[0], a[1], b[0], b[1], c[0]])
+        data.append([f"mu={10**idx} | nu={10**-idx}", a[0], a[1], b[0], b[1], c[0], c[1]])
 
-    headers = ["", "2.2x10^-10|Sequential", "2.2x10^-10|BP", "2.2x10^-16|Sequential", "2.2x10^-16|BP", "COMPoissonReg"]
+    headers = ["", "2.2x10^-10|Sequential", "2.2x10^-10|BP", "2.2x10^-16|Sequential", "2.2x10^-16|BP", "brms", "COMPoissonReg"]
 
     print(tabulate(data, headers, tablefmt="fancy_grid"))
