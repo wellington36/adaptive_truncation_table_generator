@@ -25,7 +25,7 @@ def f(theta: tuple, k: int):
 
 
 if __name__ == "__main__":
-    mp.dps = 400
+    mp.dps = 200
 
     mu = [mpf(10), mpf(100), mpf(1000), mpf(10000)]
     nu = [mpf("0.1"), mpf("0.01"), mpf("0.001"), mpf("0.0001")]
