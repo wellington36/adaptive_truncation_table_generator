@@ -118,13 +118,3 @@ functions{
     return log1m_exp(com_poisson_lcdf(y | mu, nu));
   }
 }
-
-data {
-  real loglambda;
-  real nu;
-}
-
-generated quantities {
-  real result;
-  result = log_Z_com_poisson(loglambda, nu);
-}

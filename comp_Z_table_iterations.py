@@ -2,10 +2,12 @@ from src.bounding_pairs_mp import bounding_pairs_mp
 from src.sequential_mp import sequential_mp
 from src.brute_mp import brute_mp
 
+# pip install /path/to/local/clone
+import pybind_stan_fns as psf
+
 from rpy2.robjects.packages import importr
 from mpmath import mp, mpf, log, exp
 from utils.utils import logdiffexp
-from cmdstanpy import CmdStanModel
 from tabulate import tabulate
 from math import lgamma
 import math
@@ -35,9 +37,8 @@ if __name__ == "__main__":
     lamb = [mu[i]**nu[i] for i in range(0,4)]
     loglamb = [log(x) for x in lamb]
     M = [10**4, 10**5, 10**5, 3*10**5]
-    #M = [10**4, 10**4, 10**5, 10**5]
 
-    # 2.2x10^-10
+    # error = 2.2x10^-10
     error = mpf(2)**mpf(-52) * 10**6
     error_minus_10 = []
     for i in range(len(mu)):
@@ -46,7 +47,7 @@ if __name__ == "__main__":
 
         error_minus_10.append([sequential_iter, bp_iter])
 
-    # 2.2x10^-16
+    # error = 2.2x10^-16
     error = mpf(2)**mpf(-52)
     error_minus_16 = []
     for i in range(len(mu)):
@@ -57,7 +58,7 @@ if __name__ == "__main__":
     
     # Libraries
     comp_reg = importr('COMPoissonReg')
-    model = CmdStanModel(stan_file='stan/comp_Z_brms_fixed.stan')
+    brms_fixed_comp = psf.expose('stan/comp_Z_brms_fixed.stan')
 
     def dcmp_in_log_scale(x, lambda_, nu):
         # Call the dcmp function with log=TRUE in R
@@ -68,14 +69,7 @@ if __name__ == "__main__":
     for i in range(len(mu)):
         brute_value = brute_mp(f, (loglamb[i], nu[i]), M[i], initial_k=1)[1]
 
-        fit = model.sample(data={'loglambda': float(math.log(mu[i])), 'nu': float(nu[i])},
-                           fixed_param = True,
-                           sig_figs = 18,
-                           iter_sampling = 1,
-                           adapt_engaged = False,
-                           chains = 1
-        )
-        brms = fit.stan_variable('result')[0]
+        brms = brms_fixed_comp.log_Z_com_poisson(float(math.log(mu[i])), float(nu[i]))
         dcmp = log(list(comp_reg.dcmp(0, float(lamb[i]), float(nu[i])))[0])
 
         libraries.append([exp(logdiffexp(brute_value, brms)), exp(logdiffexp(brute_value, -1*mpf(dcmp)))])
