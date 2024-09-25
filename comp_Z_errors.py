@@ -37,6 +37,7 @@ if __name__ == "__main__":
     lamb = [mu[i]**nu[i] for i in range(0,4)]
     loglamb = [log(x) for x in lamb]
     M = [10**4, 10**5, 10**5, 3*10**5]
+    #M = [10**4]*4  # test
 
     # error = 2.2x10^-10
     error = mpf(2)**mpf(-52) * 10**6
