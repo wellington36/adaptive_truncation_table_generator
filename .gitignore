@@ -3,5 +3,8 @@ utils/__pycache__
 __pycache__
 
 sandbox.py
+test.py
 
-stan/comp_Z_brms_fidex.cpp*
+comp_Z_brms_fixed.cpp
+comp_Z_brms_fixed.cpp-pre
+comp_Z_brms_fixed.cpython-312-x86_64-linux-gnu.so
