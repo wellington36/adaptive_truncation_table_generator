@@ -13,6 +13,7 @@ from math import lgamma
 import math
 
 
+# function of each term in log scale
 def f(theta: tuple, k: int):
     """
     terms of the normalization contant series

@@ -5,6 +5,7 @@ from mpmath import mp, mpf, log
 from tabulate import tabulate
 
 
+# function of each term in log scale
 def f(a: float, n: int):
     return - mpf(2)*log(mpf(n)+1) - (mpf(n)+1)*log(a)
 
