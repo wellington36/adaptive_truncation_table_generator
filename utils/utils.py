@@ -1,4 +1,5 @@
-from mpmath import mp, mpf, exp, log, expm1, fabs
+from mpmath import mp, exp, log
+
 
 def logsumexp(a):
     with mp.extradps(100):

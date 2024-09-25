@@ -1,7 +1,6 @@
-from mpmath import mp, mpf, exp, log, expm1, fabs
 from utils.utils import logsumexp
-from math import lgamma
-import mpmath
+from mpmath import mpf, log
+
 
 def brute_mp(f, theta, M, initial_k):
     k = initial_k

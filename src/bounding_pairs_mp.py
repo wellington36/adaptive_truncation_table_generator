@@ -1,7 +1,6 @@
-from mpmath import mp, mpf, exp, log, expm1
+from mpmath import mpf, log, expm1
 from utils.utils import logsumexp
-from math import lgamma
-import mpmath
+
 
 def bounding_pairs_mp(f, theta, M, L, eps, initial_k):
     k = initial_k

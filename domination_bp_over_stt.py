@@ -1,17 +1,9 @@
 from src.sum_to_threshold_mp import sum_to_threshold_mp
 from src.bounding_pairs_mp import bounding_pairs_mp
-from src.sequential_mp import sequential_mp
-from src.brute_mp import brute_mp
 
-# pip install /path/to/local/clone
-import pybind_stan_fns as psf
-
-from rpy2.robjects.packages import importr
-from mpmath import mp, mpf, log, exp
-from utils.utils import logdiffexp
+from mpmath import mp, mpf, log
 from tabulate import tabulate
-from math import lgamma
-import math
+
 
 def f(a: float, n: int):
     return - mpf(2)*log(mpf(n)+1) - (mpf(n)+1)*log(a)
