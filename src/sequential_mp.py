@@ -7,6 +7,9 @@ def sequential_mp(f, theta, M, eps, initial_k):
     leps = log(eps)
     log_terms_brute = [log(mpf(0))] * (M+initial_k+1)
 
+    if (f(theta, M) > leps):
+        raise ValueError("It is not possible to reach the stopping criterion with the given M.")
+
     log_terms_brute[k] = f(theta, k)
     log_terms_brute[k+1] = f(theta, k+1)
     k+=1

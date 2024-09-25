@@ -8,6 +8,9 @@ def bounding_pairs_mp(f, theta, M, L, eps, initial_k):
     leps = log(eps)
     log_terms = [log(mpf(0))] * (M+initial_k)
 
+    if (f(theta, M) + log(abs(L + (mpf(1)/(mpf(1) - L*(L*L)) + mpf(1)/(expm1(f(theta, M) - f(theta, M-1)))))) >= log(mpf(2)) + leps):
+        raise ValueError("It is not possible to reach the stopping criterion with the given M.")
+
     log_terms[k] = f(theta, k)
     log_terms[k+1] = f(theta, k+1)
     k+=1
