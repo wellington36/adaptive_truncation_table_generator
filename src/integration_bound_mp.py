@@ -10,10 +10,11 @@ def integration_bound_mp(f, g, theta, M, eps, initial_k):
         raise ValueError("It is not possible to reach the stopping criterion with the given M.")
 
     log_terms[k] = f(theta, k)
+    k+=1
 
     while (logdiffexp(g(theta, k-1), g(theta, k)) > log(2) + leps):
-        k+=1
         log_terms[k] = f(theta, k)
+        k+=1
     
     log_sum = logsumexp(log_terms)
 
