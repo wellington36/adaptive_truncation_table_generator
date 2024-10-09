@@ -66,8 +66,7 @@ def mcmc_log_freq(values, freqs, iterations=1000, theta1_init=0.1, theta2_init=0
         log_posterior_proposed = log_posterior_freq(values, freqs, theta1_proposed, theta2_proposed, alpha, beta, sigma)
 
         # Acceptance probability (log version)
-        log_acceptance_prob = log_posterior_proposed - log_posterior_current
-        acceptance_prob = exp(log_acceptance_prob)  # Convert back to probability space
+        acceptance_prob = exp(log_posterior_proposed) / exp(log_posterior_current)
 
         # Accept or reject the proposal
         if np.random.rand() < acceptance_prob:
