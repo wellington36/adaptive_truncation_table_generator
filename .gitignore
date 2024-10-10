@@ -2,7 +2,7 @@ src/__pycache__
 utils/__pycache__
 __pycache__
 
-sandbox.py
+sandbox*
 test.py
 
 comp_Z_brms_fixed.cpp
