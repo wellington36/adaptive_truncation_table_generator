@@ -1,9 +1,11 @@
-from mpmath import mp, exp, log
+from mpmath import mp, exp, log, fsum
 
 
-def logsumexp(a):
-    with mp.extradps(100):
-        return mp.log(mp.fsum([mp.exp(ai) for ai in a]))
+def logsumexp(a: list):
+    with mp.extradps(100):  # Increase precision
+        a_max = max(a)
+
+        return a_max + log(fsum([mp.exp(ai - a_max) for ai in a]))
 
 def logdiffexp(a, b):
     if b > a:
