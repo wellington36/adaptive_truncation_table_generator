@@ -1,6 +1,6 @@
 from src.bounding_pairs_mp import bounding_pairs_mp
 from src.sequential_mp import sequential_mp
-from src.brute_mp import brute_mp
+from fixed_mp import fixed_mp
 
 # pip install /path/to/local/clone
 import pybind_stan_fns as psf
@@ -68,7 +68,7 @@ if __name__ == "__main__":
 
     libraries = []
     for i in range(len(mu)):
-        brute_value = brute_mp(f, (loglamb[i], nu[i]), M[i], initial_k=1)[1]
+        brute_value = fixed_mp(f, (loglamb[i], nu[i]), M[i], initial_k=1)[1]
 
         brms = brms_fixed_comp.log_Z_com_poisson(float(math.log(mu[i])), float(nu[i]))
         dcmp = log(list(comp_reg.dcmp(0, float(lamb[i]), float(nu[i])))[0])

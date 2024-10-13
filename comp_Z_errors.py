@@ -1,6 +1,6 @@
 from src.bounding_pairs_mp import bounding_pairs_mp
 from src.sequential_mp import sequential_mp
-from src.brute_mp import brute_mp
+from fixed_mp import fixed_mp
 
 # pip install /path/to/local/clone
 import pybind_stan_fns as psf
@@ -45,7 +45,7 @@ if __name__ == "__main__":
     error = mpf(2)**mpf(-52) * 10**6
     error_minus_10 = []
     for i in range(len(mu)):
-        brute_value = brute_mp(f, (loglamb[i], nu[i]), M[i], initial_k=initial_k)[1]
+        brute_value = fixed_mp(f, (loglamb[i], nu[i]), M[i], initial_k=initial_k)[1]
         bp_iter = bounding_pairs_mp(f, (loglamb[i], nu[i]), M[i], mpf(0), error, initial_k=initial_k)[1]
         sequential_iter = sequential_mp(f, (loglamb[i],nu[i]), M[i], error, initial_k=initial_k)[1]
 
@@ -55,7 +55,7 @@ if __name__ == "__main__":
     error = mpf(2)**mpf(-52)
     error_minus_16 = []
     for i in range(len(mu)):
-        brute_value = brute_mp(f, (loglamb[i], nu[i]), M[i], initial_k=initial_k)[1]
+        brute_value = fixed_mp(f, (loglamb[i], nu[i]), M[i], initial_k=initial_k)[1]
         bp_iter = bounding_pairs_mp(f, (loglamb[i], nu[i]), M[i], mpf(0), error, initial_k=initial_k)[1]
         sequential_iter = sequential_mp(f, (loglamb[i],nu[i]), M[i], error, initial_k=initial_k)[1]
 
@@ -72,7 +72,7 @@ if __name__ == "__main__":
 
     libraries = []
     for i in range(len(mu)):
-        brute_value = brute_mp(f, (loglamb[i], nu[i]), M[i], initial_k=initial_k)[1]
+        brute_value = fixed_mp(f, (loglamb[i], nu[i]), M[i], initial_k=initial_k)[1]
 
         brms = brms_fixed_comp.log_Z_com_poisson(float(math.log(mu[i])), float(nu[i]))
         dcmp = log(list(comp_reg.dcmp(0, float(lamb[i]), float(nu[i])))[0])

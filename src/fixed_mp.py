@@ -2,7 +2,7 @@ from utils.utils import logsumexp
 from mpmath import mpf, log
 
 
-def brute_mp(f, theta, M, initial_k):
+def fixed_mp(f, theta, M, initial_k):
     k = initial_k
     log_terms = [log(mpf(0))] * (M+initial_k+1)
 
@@ -14,6 +14,6 @@ def brute_mp(f, theta, M, initial_k):
         k+=1
         log_terms[k] = f(theta, k)
     
-    log_sum = logsumexp(log_terms)
+    log_sum = logsumexp(log_terms[initial_k:(k+1)])
 
     return (k-initial_k, log_sum)
