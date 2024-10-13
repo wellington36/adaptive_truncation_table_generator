@@ -8,10 +8,8 @@ import pybind_stan_fns as psf
 from rpy2.robjects.packages import importr
 from mpmath import mp, mpf, log, exp
 from utils.utils import logdiffexp
-from tabulate import tabulate
 from math import lgamma
 from random import random
-import math
 from time import time
 
 
@@ -45,7 +43,7 @@ if __name__ == "__main__":
     nu_u = 100
 
     F = 0
-    N = 1000
+    N = 10000
 
     for i in range(1, N+1):
         t0 = time()
@@ -59,7 +57,7 @@ if __name__ == "__main__":
 
         brute_value = brute_mp(f, (loglamb, nu), M=k*10, initial_k=initial_k)[1]
 
-        if (i % 10 == 0) and exp(logdiffexp(bp_value, brute_value)) < eps:
+        if (i % 50 == 0) and exp(logdiffexp(bp_value, brute_value)) < eps:
             print(f"Pass test {i}/{N}. (k = {k} | time = {(time()-t0):.2f}s)")
         
         if exp(logdiffexp(bp_value, brute_value)) > eps:
