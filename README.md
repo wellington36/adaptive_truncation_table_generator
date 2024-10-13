@@ -37,5 +37,6 @@ Run:
 python domination_bp_over_stt.py
 ```
 
-![image](https://github.com/user-attachments/assets/990b1f49-02a7-4091-a415-e48686614627)
+![image](https://github.com/user-attachments/assets/3110aed0-b43c-4e65-985d-6a7bb140b522)
+
 
