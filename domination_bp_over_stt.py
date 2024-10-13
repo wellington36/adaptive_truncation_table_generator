@@ -10,11 +10,11 @@ def f(a: float, n: int):
     return - mpf(2)*log(mpf(n)+1) - (mpf(n)+1)*log(a)
 
 if __name__ == "__main__":
-    mp.dps = 200
+    mp.dps = 100
 
-    a = [mpf(100), mpf(10), mpf(2), mpf('1.1'), mpf('1.01'), mpf('1.001')]
+    a = [mpf(2), mpf('1.1'), mpf('1.01'), mpf('1.001'), mpf('1.0001'), mpf('1.00001')]
     L = [1/x for x in a]
-    M = [3*10**6 for _ in range(len(a))]
+    M = [5*10**6 for _ in range(len(a))]
 
     stt_terms = [None] * len(a)
     bp_terms = [None] * len(a)
@@ -25,8 +25,8 @@ if __name__ == "__main__":
         percentage[i] = bp_terms[i]/stt_terms[i] - 1
     
     data = []
-    for idx, (stt, bp, perc) in enumerate(zip(stt_terms, bp_terms, percentage), start=1):
-        data.append([f"a={a[idx-1]}", stt, bp, perc])
+    for idx, (stt, bp, perc) in enumerate(zip(stt_terms, bp_terms, percentage)):
+        data.append([f"a={a[idx]}", stt, bp, perc])
     
     headers = ["", "STT", "BP", "Percent"]
 
