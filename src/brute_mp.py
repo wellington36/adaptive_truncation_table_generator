@@ -14,6 +14,6 @@ def brute_mp(f, theta, M, initial_k):
         k+=1
         log_terms[k] = f(theta, k)
     
-    log_sum = logsumexp(log_terms[initial_k:(k+1)])
+    log_sum = logsumexp(log_terms)
 
     return (k-initial_k, log_sum)
