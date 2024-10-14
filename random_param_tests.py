@@ -1,15 +1,10 @@
 from src.bounding_pairs_mp import bounding_pairs_mp
-from src.sequential_mp import sequential_mp
 from src.fixed_mp import fixed_mp
 
-# pip install /path/to/local/clone
-import pybind_stan_fns as psf
-
-from rpy2.robjects.packages import importr
 from mpmath import mp, mpf, log, exp
 from utils.utils import logdiffexp
-from math import lgamma
 from random import random
+from math import lgamma
 from time import time
 
 
@@ -63,7 +58,7 @@ if __name__ == "__main__":
             print(f"Pass test {i}/{N}. (k = {k} | time = {(time()-t0):.2f}s)")
         
         if exp(logdiffexp(bp_value, fixed_value)) > eps:
-            print(f"Fail test {i}: theta = {theta} | bp_value = {bp_value} | brute_value = {fixed_value} | error = {float(exp(logdiffexp(bp_value, fixed_value)))}.")
+            print(f"Fail test {i}: theta = {theta} | bp_value = {bp_value} | fixed_value = {fixed_value} | error = {float(exp(logdiffexp(bp_value, fixed_value)))}.")
             F+=1
 
 
