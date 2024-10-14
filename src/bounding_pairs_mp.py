@@ -1,17 +1,33 @@
-from mpmath import mpf, log, expm1, log1p, exp, im
-from utils.utils import logsumexp, fma, logdiffexp
+from mpmath import mpf, log, expm1
+from utils.utils import logsumexp
 
 
 def bounding_pairs_mp(f, theta, M, L, eps, initial_k):
+    ''' Assuming that the series passes the ratio test, we obtain an approximation with guaranteed error.
+    
+    Parameters:
+    f                 (function): Log of the terms function
+    theta (first parameter of f): Parameter of the function
+    M                      (int): Maximum number of iterations
+    L                    (float): Parameter of the test ratio
+    eps                  (float): Error tolerance
+    initial_k              (int): Start of the sum
+
+    Return: (iterations, approximation in log scale)
+    '''
     k = initial_k
+    L = mpf(L)
+    eps = mpf(eps)
     leps = log(eps)
     log_terms = [log(mpf(0))] * (M+initial_k)
 
+    # Check the monotonicity of the ratio
     if L == 0:
         is_decreasing = True
     else:
-        is_decreasing = f(theta, M) - f(theta, M-1) > log(L)
+        is_decreasing = mpf(f(theta, M)) - mpf(f(theta, M-1)) > log(L)
 
+    # Check if is the M sufficient
     if ((is_decreasing and f(theta, M) - log(- expm1(f(theta, M) - f(theta, M-1))) >= log(mpf(2)) + leps)
         or (not is_decreasing and log_terms[k] + log(L) - log(1 - L) >= log(mpf(2)) + leps)):
         raise ValueError("It is not possible to reach the stopping criterion with the given M.")
@@ -27,8 +43,10 @@ def bounding_pairs_mp(f, theta, M, L, eps, initial_k):
         k+=1
         log_terms[k] = f(theta, k)
     
+    # Compute the log(sum) (the range improve performance)
     log_sum = logsumexp(log_terms[initial_k:(k+1)])
 
+    # Compute the boundings and return the midpoint of the interval
     Bound1 = log_terms[k] + log(L) - log(1 - L)
     Bound2 = log_terms[k] - log(- expm1(log_terms[k] - log_terms[k-1]))
     return (k-initial_k, logsumexp([log_sum, Bound1 - log(mpf(2)), Bound2 - log(mpf(2))]))
