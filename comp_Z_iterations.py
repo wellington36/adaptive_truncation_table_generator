@@ -1,15 +1,14 @@
 from src.bounding_pairs_mp import bounding_pairs_mp
 from src.sequential_mp import sequential_mp
-from src.brute_mp import brute_mp
+from src.fixed_mp import fixed_mp
 
 # pip install /path/to/local/clone
 import pybind_stan_fns as psf
 
 from rpy2.robjects.packages import importr
-from mpmath import mp, mpf, log, exp
+from mpmath import mp, mpf, log, exp, loggamma
 from utils.utils import logdiffexp
 from tabulate import tabulate
-from math import lgamma
 import math
 
 
@@ -27,7 +26,7 @@ def f(theta: tuple, k: int):
     elif (k == 2):
         return theta[0]
     else:
-        return (mpf(k)-1) * theta[0] - theta[1] * lgamma(mpf(k))
+        return (mpf(k)-1) * theta[0] - theta[1] * loggamma(mpf(k))
 
 
 if __name__ == "__main__":
@@ -68,12 +67,12 @@ if __name__ == "__main__":
 
     libraries = []
     for i in range(len(mu)):
-        brute_value = brute_mp(f, (loglamb[i], nu[i]), M[i], initial_k=1)[1]
+        fixed_value = fixed_mp(f, (loglamb[i], nu[i]), M[i], initial_k=1)[1]
 
         brms = brms_fixed_comp.log_Z_com_poisson(float(math.log(mu[i])), float(nu[i]))
         dcmp = log(list(comp_reg.dcmp(0, float(lamb[i]), float(nu[i])))[0])
 
-        libraries.append([exp(logdiffexp(brute_value, brms)), exp(logdiffexp(brute_value, -1*mpf(dcmp)))])
+        libraries.append([exp(logdiffexp(fixed_value, brms)), exp(logdiffexp(fixed_value, -1*mpf(dcmp)))])
 
     
     # Organize in a table
