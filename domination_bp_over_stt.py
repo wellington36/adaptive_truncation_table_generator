@@ -15,13 +15,14 @@ if __name__ == "__main__":
     a = [mpf(2), mpf('1.1'), mpf('1.01'), mpf('1.001'), mpf('1.0001'), mpf('1.00001')]
     L = [1/x for x in a]
     M = [5*10**6 for _ in range(len(a))]
+    initial_k = 0
 
     stt_terms = [None] * len(a)
     bp_terms = [None] * len(a)
     percentage = [None] * len(a)
     for i in range(len(a)):
-        bp_terms[i] = bounding_pairs_mp(f, (a[i]), M[i], L[i], mpf(2)**mpf(-52), initial_k=2)[0]
-        stt_terms[i] = sum_to_threshold_mp(f, (a[i]), M[i], L[i], mpf(2)**mpf(-52), initial_k=2)[0]
+        bp_terms[i] = bounding_pairs_mp(f, (a[i]), M[i], L[i], mpf(2)**mpf(-52), initial_k)[0]
+        stt_terms[i] = sum_to_threshold_mp(f, (a[i]), M[i], L[i], mpf(2)**mpf(-52), initial_k)[0]
         percentage[i] = bp_terms[i]/stt_terms[i] - 1
     
     data = []
