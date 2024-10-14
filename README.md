@@ -12,7 +12,8 @@ Run (check if auxiliary libraries are installed):
 python comp_Z_iterations.py
 ```
 
-![image](https://github.com/user-attachments/assets/d6cdf301-8cd9-46f4-b7cf-b25ab33a637c)
+![image](https://github.com/user-attachments/assets/0455d6f9-36d7-4713-80b4-26bfb2e95ef9)
+
 
 - `comp_Z_errors.py`, has dependency:
   - `utils/utils.py`: function `logdiffexp`;
@@ -25,7 +26,8 @@ Run (check if auxiliary libraries are installed):
 ```bash
 python comp_Z_errors.py
 ```
-![image](https://github.com/user-attachments/assets/99350816-b53e-4e6e-959b-9aa41a54db79)
+![image](https://github.com/user-attachments/assets/1c944657-f6f2-4221-a7ef-16af12c7c9db)
+
 
 
 - `domination_bp_over_stt.py`, has dependency:
@@ -38,6 +40,4 @@ Run:
 python domination_bp_over_stt.py
 ```
 
-![image](https://github.com/user-attachments/assets/3110aed0-b43c-4e65-985d-6a7bb140b522)
-
-
+![image](https://github.com/user-attachments/assets/b3a2b72a-5471-40ce-8ab2-82f271a20f0b)
