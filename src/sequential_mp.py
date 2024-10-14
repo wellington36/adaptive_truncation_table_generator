@@ -1,5 +1,5 @@
 from utils.utils import logsumexp, logdiffexp
-from mpmath import mpf, log, exp
+from mpmath import mpf, log
 
 
 def sequential_mp(f, theta, M, eps, initial_k):

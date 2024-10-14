@@ -68,12 +68,12 @@ if __name__ == "__main__":
 
     libraries = []
     for i in range(len(mu)):
-        brute_value = fixed_mp(f, (loglamb[i], nu[i]), M[i], initial_k=1)[1]
+        fixed_value = fixed_mp(f, (loglamb[i], nu[i]), M[i], initial_k=1)[1]
 
         brms = brms_fixed_comp.log_Z_com_poisson(float(math.log(mu[i])), float(nu[i]))
         dcmp = log(list(comp_reg.dcmp(0, float(lamb[i]), float(nu[i])))[0])
 
-        libraries.append([exp(logdiffexp(brute_value, brms)), exp(logdiffexp(brute_value, -1*mpf(dcmp)))])
+        libraries.append([exp(logdiffexp(fixed_value, brms)), exp(logdiffexp(fixed_value, -1*mpf(dcmp)))])
 
     
     # Organize in a table
