@@ -1,5 +1,5 @@
 from src.bounding_pairs_mp import bounding_pairs_mp
-from src.brute_mp import brute_mp
+from src.fixed_mp import fixed_mp
 from utils.utils import logdiffexp
 
 from mpmath import mp, mpf, log, pi, exp, loggamma, fsum
@@ -47,7 +47,9 @@ def log_Z_comp_approx_max(log_lambda, nu):
 if __name__ == '__main__':
     mp.dps = 300
     M = 10**5
+    L = 0
     eps = mpf(2)**mpf(-52)
+    initial_k = 1
 
     lamb = [mpf('1.5'), mpf('1.5')+eps*10**10, mpf('1.5'), mpf(5), mpf('1.5'), mpf(5)]
     nu = [mpf(1), mpf(1), mpf(1)+eps*10**10, mpf('0.8'), mpf(2), mpf(2)]
@@ -58,18 +60,18 @@ if __name__ == '__main__':
     approx_time = []
 
     for i in range(len(lamb)):
-        print(f"Init: lambda = {lamb[i]} | nu = {nu[i]}")
+        print(f"Init: lambda = {float(lamb[i])} | nu = {float(nu[i])}")
         # test bounding pairs
         t0_bound = time.time()
-        k, log_Z_bound = bounding_pairs_mp(f, (log(lamb[i]), nu[i]), M, 0, eps, initial_k=1)
+        k, log_Z_bound = bounding_pairs_mp(f, (log(lamb[i]), nu[i]), M, L, eps, initial_k)
         t1_bound = time.time() - t0_bound
 
         t0_bound = time.time()
-        _, _ = bounding_pairs_mp(f, (log(lamb[i]), nu[i]), M, 0, eps, initial_k=1)
+        _, _ = bounding_pairs_mp(f, (log(lamb[i]), nu[i]), M, L, eps, initial_k)
         t2_bound = time.time() - t0_bound
 
         t0_bound = time.time()
-        _, _ = bounding_pairs_mp(f, (log(lamb[i]), nu[i]), M, 0, eps, initial_k=1)
+        _, _ = bounding_pairs_mp(f, (log(lamb[i]), nu[i]), M, L, eps, initial_k)
         t3_bound = time.time() - t0_bound
 
         # test approximations
@@ -86,12 +88,12 @@ if __name__ == '__main__':
         t3_approx = time.time() - t0_approx
 
         # true
-        print("Brute evaluation...")
-        _, brute = brute_mp(f, (log(lamb[i]), nu[i]), M, initial_k=1)
+        print("Fixed evaluation...")
+        _, fixed = fixed_mp(f, (log(lamb[i]), nu[i]), M, initial_k)
 
         # storage variables
-        bounding_pairs_error.append((f"{float(exp(logdiffexp(log_Z_bound, brute)))} / {k}"))
-        approx_error.append(exp(logdiffexp(log_Z_approx, brute)))
+        bounding_pairs_error.append((f"{float(exp(logdiffexp(log_Z_bound, fixed)))} / {k}"))
+        approx_error.append(exp(logdiffexp(log_Z_approx, fixed)))
 
         bounding_pairs_time.append((t1_bound + t2_bound + t3_bound)/3)
         approx_time.append((t1_approx + t2_approx + t3_approx)/3)
@@ -100,8 +102,8 @@ if __name__ == '__main__':
     # Organize in a table
     data = []
     for idx, (a, b, c, d) in enumerate(zip(bounding_pairs_error, approx_error, bounding_pairs_time, approx_time)):
-        data.append([f"lambda={lamb[idx]} | nu={nu[idx]}", a, b, c, d])
+        data.append([f"lambda={float(lamb[idx])} | nu={float(nu[idx])}", a, b, c*1000, d*1000])
 
-    headers = ["", "Error|Bounding / k", "Error|Approx", "Time(s)|Bounding", "Time(s)|Approx"]
+    headers = ["", "Error|Bounding / k", "Error|Approx", "Time(ms)|Bounding", "Time(ms)|Approx"]
 
     print(tabulate(data, headers, tablefmt="fancy_grid"))
