@@ -1,6 +1,6 @@
 from src.bounding_pairs_mp import bounding_pairs_mp
 from src.sequential_mp import sequential_mp
-from fixed_mp import fixed_mp
+from src.fixed_mp import fixed_mp
 
 # pip install /path/to/local/clone
 import pybind_stan_fns as psf
