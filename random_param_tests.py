@@ -1,10 +1,9 @@
 from src.bounding_pairs_mp import bounding_pairs_mp
 from src.fixed_mp import fixed_mp
 
-from mpmath import mp, mpf, log, exp
+from mpmath import mp, mpf, log, exp, loggamma
 from utils.utils import logdiffexp
 from random import random
-from math import lgamma
 from time import time
 
 
@@ -23,7 +22,7 @@ def f(theta: tuple, k: int):
     elif (k == 2):
         return theta[0]
     else:
-        return (mpf(k)-1) * theta[0] - theta[1] * lgamma(mpf(k))
+        return (mpf(k)-1) * theta[0] - theta[1] * loggamma(mpf(k))
 
 if __name__ == "__main__":
     mp.dps = 400
