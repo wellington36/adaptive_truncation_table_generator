@@ -1,5 +1,5 @@
 from utils.utils import logsumexp, logdiffexp
-from mpmath import mpf, log
+from mpmath import mpf, log, exp
 
 
 def sequential_mp(f, theta, M, eps, initial_k):
@@ -39,7 +39,7 @@ def sequential_mp(f, theta, M, eps, initial_k):
     log_terms = [log(mpf(0))] * (M+initial_k+1)
 
     log_terms[k] = term(k)
-    log_terms[k+1] = term(k)
+    log_terms[k+1] = term(k+1)
     k+=1
     
     log_sum = logsumexp(log_terms[initial_k:(k+1)])
