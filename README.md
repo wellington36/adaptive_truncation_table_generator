@@ -41,3 +41,16 @@ python domination_bp_over_stt.py
 ```
 
 ![image](https://github.com/user-attachments/assets/b3a2b72a-5471-40ce-8ab2-82f271a20f0b)
+
+- `p_series_iterations.py`, has dependency:
+  - `src/integration_bound_mp.py`: The Bounding pairs with integral test approach with mpmath structure;
+  - `src/sequential_mp.py`: The Sequential approach with brute force and mpmath structure;
+
+Run:
+
+```bash
+python p_series_iterations.py
+```
+
+![image](https://github.com/user-attachments/assets/50331758-2663-411b-83ca-ed1f5fcdd2ef)
+
