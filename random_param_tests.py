@@ -53,15 +53,17 @@ if __name__ == "__main__":
         lamb = mu**nu
         loglamb = log(lamb)
 
-        k, bp_value = bounding_pairs_mp(f, (loglamb, nu), M, L, eps, initial_k)
+        theta = (loglamb, nu)
 
-        fixed_value = fixed_mp(f, (loglamb, nu), M=k*10, initial_k=initial_k)[1]
+        k, bp_value = bounding_pairs_mp(f, theta, M, L, eps, initial_k)
+
+        fixed_value = fixed_mp(f, theta, M=k*10, initial_k=initial_k)[1]
 
         if (i % 50 == 0) and exp(logdiffexp(bp_value, fixed_value)) < eps:
             print(f"Pass test {i}/{N}. (k = {k} | time = {(time()-t0):.2f}s)")
         
         if exp(logdiffexp(bp_value, fixed_value)) > eps:
-            print(f"Fail test {i}: mu = {mu} | nu = {nu} | bp_value = {bp_value} | brute_value = {fixed_value} | error = {float(exp(logdiffexp(bp_value, fixed_value)))}.")
+            print(f"Fail test {i}: theta = {theta} | bp_value = {bp_value} | brute_value = {fixed_value} | error = {float(exp(logdiffexp(bp_value, fixed_value)))}.")
             F+=1
 
 
