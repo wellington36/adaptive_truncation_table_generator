@@ -21,19 +21,23 @@ def bounding_pairs_mp(f, theta, M, L, eps, initial_k):
     leps = log(eps)
     log_terms = [log(mpf(0))] * (M+initial_k)
 
+    # Aux function
+    def term(k):
+        return mpf(f(theta, k))
+
     # Check the monotonicity of the ratio
     if L == 0:
         is_decreasing = True
     else:
-        is_decreasing = mpf(f(theta, M)) - mpf(f(theta, M-1)) > log(L)
+        is_decreasing = term(M) - term(M-1) > log(L)
 
     # Check if is the M sufficient
-    if ((is_decreasing and f(theta, M) - log(- expm1(f(theta, M) - f(theta, M-1))) >= log(mpf(2)) + leps)
-        or (not is_decreasing and log_terms[k] + log(L) - log(1 - L) >= log(mpf(2)) + leps)):
+    if ((is_decreasing and term(M) - log(- expm1(term(M) - term(M-1))) >= log(mpf(2)) + leps)
+        or (not is_decreasing and term(M) + log(L) - log(1 - L) >= log(mpf(2)) + leps)):
         raise ValueError("It is not possible to reach the stopping criterion with the given M.")
 
-    log_terms[k] = f(theta, k)
-    log_terms[k+1] = f(theta, k+1)
+    log_terms[k] = term(k)
+    log_terms[k+1] = term(k+1)
     k+=1
 
     while ((log_terms[k] >= log_terms[k-1] or
@@ -41,7 +45,7 @@ def bounding_pairs_mp(f, theta, M, L, eps, initial_k):
            (not is_decreasing and log_terms[k] + log(L) - log(1 - L) >= log(mpf(2)) + leps)) and
            k < M+initial_k):
         k+=1
-        log_terms[k] = f(theta, k)
+        log_terms[k] = term(k)
     
     # Compute the log(sum) (the range improve performance)
     log_sum = logsumexp(log_terms[initial_k:(k+1)])
