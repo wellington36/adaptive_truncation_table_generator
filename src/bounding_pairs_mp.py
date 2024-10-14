@@ -1,5 +1,5 @@
-from mpmath import mpf, log, expm1, log1p
-from utils.utils import logsumexp, fma
+from mpmath import mpf, log, expm1, log1p, exp, im
+from utils.utils import logsumexp, fma, logdiffexp
 
 
 def bounding_pairs_mp(f, theta, M, L, eps, initial_k):
@@ -13,7 +13,7 @@ def bounding_pairs_mp(f, theta, M, L, eps, initial_k):
         is_decreasing = f(theta, M) - f(theta, M-1) > log(L)
 
     if ((is_decreasing and f(theta, M) - log(- expm1(f(theta, M) - f(theta, M-1))) >= log(mpf(2)) + leps)
-        or (not is_decreasing and log1p(fma(L, L, L)) + (f(theta, M) - log1p(((-L)*L)*L)) >= log(mpf(2)) + leps)):
+        or (not is_decreasing and log_terms[k] + log(L) - log(1 - L) >= log(mpf(2)) + leps)):
         raise ValueError("It is not possible to reach the stopping criterion with the given M.")
 
     log_terms[k] = f(theta, k)
@@ -22,13 +22,13 @@ def bounding_pairs_mp(f, theta, M, L, eps, initial_k):
 
     while ((log_terms[k] >= log_terms[k-1] or
            (is_decreasing and log_terms[k] - log(- expm1(log_terms[k] - log_terms[k-1])) >= log(mpf(2)) + leps) or 
-           (not is_decreasing and log1p(fma(L, L, L)) + (log_terms[k] - log1p(((-L)*L)*L)) >= log(mpf(2)) + leps)) and
+           (not is_decreasing and log_terms[k] + log(L) - log(1 - L) >= log(mpf(2)) + leps)) and
            k < M+initial_k):
         k+=1
         log_terms[k] = f(theta, k)
     
     log_sum = logsumexp(log_terms[initial_k:(k+1)])
 
-    Bound1 = log1p(fma(L, L, L)) + (log_terms[k] - log1p(((-L)*L)*L))
+    Bound1 = log_terms[k] + log(L) - log(1 - L)
     Bound2 = log_terms[k] - log(- expm1(log_terms[k] - log_terms[k-1]))
     return (k-initial_k, logsumexp([log_sum, Bound1 - log(mpf(2)), Bound2 - log(mpf(2))]))
