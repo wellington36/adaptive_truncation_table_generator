@@ -13,7 +13,7 @@ def bounding_pairs_mp(f, theta, M, L, eps, initial_k):
     eps                  (float): Error tolerance
     initial_k              (int): Start of the sum
 
-    Return: (iterations, approximation in log scale)
+    Return: (iterations, approximation in log-scale)
     '''
     k = initial_k
     L = mpf(L)
