@@ -25,7 +25,8 @@ Run (check if auxiliary libraries are installed):
 ```bash
 python comp_Z_errors.py
 ```
-![image](https://github.com/user-attachments/assets/abc0e82d-6409-42d2-ac67-6e5faf0aae63)
+![image](https://github.com/user-attachments/assets/99350816-b53e-4e6e-959b-9aa41a54db79)
+
 
 - `domination_bp_over_stt.py`, has dependency:
   - `src/bounding_pairs_mp.py`: The Bounding pairs approach with mpmath structure;
