@@ -1,7 +1,19 @@
-from mpmath import mpf, log, expm1
-from utils.utils import logsumexp, logdiffexp
+from utils.utils import logsumexp
+from mpmath import mpf, log
 
 def integration_bound_mp(f, g, theta, M, eps, initial_k):
+    ''' Assuming that the series passes the integration test, we obtain an approximation with guaranteed error.
+    
+    Parameters:
+    f                 (function): Log of the terms function
+    g                 (function): Integral of n to infinity of f
+    theta (first parameter of f): Parameter of the function
+    M                      (int): Maximum number of iterations
+    eps                  (float): Error tolerance
+    initial_k              (int): Start of the sum
+
+    Return: (iterations, approximation in log-scale)
+    '''
     k = initial_k
     eps = mpf(eps)
     leps = log(eps)
