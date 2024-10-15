@@ -11,7 +11,7 @@ def log_Z_term(theta: tuple, k: int):
     elif (k == 2):
         return theta[0]
     else:
-        return theta[1] * ((mpf(k)-1) * theta[0] - loggamma(mpf(k)))
+        return (mpf(k)-1) * theta[0] - theta[1] * loggamma(mpf(k))
 
 # Log-likelihood function: Poisson distribution for count data with frequencies
 def log_likelihood_freq(values, freqs, theta1, theta2):
@@ -22,13 +22,15 @@ def log_likelihood_freq(values, freqs, theta1, theta2):
     """
     theta1 = mpf(theta1)
     theta2 = mpf(theta2)
+
+    lamb = theta1 ** theta2
     
     mp.dps = 400
     terms = [0] * len(values)
 
-    log_Z = bpm(log_Z_term, (log(theta1), theta2), 10**6, mpf(0), mpf(2)**mpf(-52), initial_k=1)[1]
+    log_Z = bpm(log_Z_term, (log(lamb), theta2), 10**6, mpf(0), mpf(2)**mpf(-52), initial_k=1)[1]
     for i in range(len(values)):
-        terms[i] = freqs[i] * (theta2 * (values[i] * theta1 - loggamma(values[i] + 1)) - log_Z)
+        terms[i] = freqs[i] * (values[i] * log(lamb) - theta2 * loggamma(values[i] + 1) - log_Z)
 
     return fsum(terms)
 
@@ -52,7 +54,7 @@ def log_posterior_freq(values, freqs, theta1, theta2, alpha=0.01, beta=0.01, sig
     return float(log_likelihood_value) + log_prior_theta1 + log_prior_theta2
 
 # MCMC with Metropolis-Hastings algorithm (log version)
-def mcmc_log_freq(values, freqs, iterations=1000, theta1_init=0.1, theta2_init=0.1, alpha=0.1, beta=0.1, sigma=1.0):
+def mcmc_log_freq(values, freqs, iterations=1500, theta1_init=0.1, theta2_init=0.1, alpha=0.1, beta=0.1, sigma=1.0):
     theta1_samples = [theta1_init]
     theta2_samples = [theta2_init]
     
@@ -87,13 +89,14 @@ freqs = [514, 503, 457, 423, 326, 233, 195, 139, 101, 77, 56, 40, 37, 22, 9, 7, 
 theta1_samples, theta2_samples = mcmc_log_freq(values, freqs)
 
 # Posterior mean estimates for theta1 and theta2
-theta1_mean = np.mean(theta1_samples)
-theta2_mean = np.mean(theta2_samples)
-log_Z = bpm(log_Z_term, (log(mpf(theta1_mean)), theta2_mean), 10**6, mpf(0), mpf(2)**mpf(-52), initial_k=1)[1]
+theta1_mean = mpf(np.mean(theta1_samples))
+theta2_mean = mpf(np.mean(theta2_samples))
+lamb = theta1_mean**theta2_mean
+log_Z = bpm(log_Z_term, (log(lamb), theta2_mean), 10**6, mpf(0), mpf(2)**mpf(-52), initial_k=1)[1]
 
 # Generate Poisson distribution based on fitted lambda
 x_values = np.arange(0, max(values)+1)
-y_values = np.array([exp((theta2_mean * (x * theta1_mean - loggamma(x + 1)) - log_Z)) for x in x_values])
+y_values = np.array([exp((x * log(lamb) - theta2_mean * loggamma(x + 1)) - log_Z) for x in x_values])
 
 # Plot the data and the fitted distribution
 plt.figure(figsize=(12, 6))
@@ -102,7 +105,7 @@ plt.figure(figsize=(12, 6))
 plt.bar(values, freqs/np.sum(freqs), width=0.6, color='g', alpha=0.6, label='Observed Data (Freqs)')
 
 # Fitted Poisson distribution
-plt.plot(x_values, y_values, 'r-', lw=2, label=f'Fitted Poisson\n mu = {theta1_mean:.6f},\n nu = {theta2_mean:.6f}')
+plt.plot(x_values, y_values, 'r-', lw=2, label=f'Fitted Poisson\n mu = {float(theta1_mean):.6f},\n nu = {float(theta2_mean):.6f}')
 
 # Titles and labels
 plt.title('Observed Data (Frequencies) and Fitted COM-Poisson Distribution (Log-Likelihood)', fontsize=14)
