@@ -20,13 +20,7 @@ def f(theta: tuple, k: int):
     theta   : (log_lambda, nu)
     k       : k-th term
     """
-
-    if k == 1:
-        return mpf(0)
-    elif (k == 2):
-        return theta[0]
-    else:
-        return (mpf(k)-1) * theta[0] - theta[1] * loggamma(mpf(k))
+    return (mpf(k)) * theta[0] - theta[1] * loggamma(mpf(k)+1)
 
 
 if __name__ == "__main__":
@@ -37,13 +31,14 @@ if __name__ == "__main__":
     lamb = [mu[i]**nu[i] for i in range(0,4)]
     loglamb = [log(x) for x in lamb]
     M = [10**4, 10**5, 10**5, 3*10**5]
+    initial_k = 0
 
     # error = 2.2x10^-10
     error = mpf(2)**mpf(-52) * 10**6
     error_minus_10 = []
     for i in range(len(mu)):
-        bp_iter = bounding_pairs_mp(f, (loglamb[i], nu[i]), M[i], mpf(0), error, initial_k=1)[0]
-        sequential_iter = sequential_mp(f, (loglamb[i],nu[i]), M[i], error, initial_k=1)[0]
+        bp_iter = bounding_pairs_mp(f, (loglamb[i], nu[i]), M[i], mpf(0), error, initial_k)[0]
+        sequential_iter = sequential_mp(f, (loglamb[i],nu[i]), M[i], error, initial_k)[0]
 
         error_minus_10.append([sequential_iter, bp_iter])
 
@@ -51,8 +46,8 @@ if __name__ == "__main__":
     error = mpf(2)**mpf(-52)
     error_minus_16 = []
     for i in range(len(mu)):
-        bp_iter = bounding_pairs_mp(f, (loglamb[i], nu[i]), M[i], mpf(0), error, initial_k=1)[0]
-        sequential_iter = sequential_mp(f, (loglamb[i],nu[i]), M[i], error, initial_k=1)[0]
+        bp_iter = bounding_pairs_mp(f, (loglamb[i], nu[i]), M[i], mpf(0), error, initial_k)[0]
+        sequential_iter = sequential_mp(f, (loglamb[i],nu[i]), M[i], error, initial_k)[0]
 
         error_minus_16.append([sequential_iter, bp_iter])
     
@@ -67,7 +62,7 @@ if __name__ == "__main__":
 
     libraries = []
     for i in range(len(mu)):
-        fixed_value = fixed_mp(f, (loglamb[i], nu[i]), M[i], initial_k=1)[1]
+        fixed_value = fixed_mp(f, (loglamb[i], nu[i]), M[i], initial_k)[1]
 
         brms = brms_fixed_comp.log_Z_com_poisson(float(math.log(mu[i])), float(nu[i]))
         dcmp = log(list(comp_reg.dcmp(0, float(lamb[i]), float(nu[i])))[0])

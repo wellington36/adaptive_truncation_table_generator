@@ -8,6 +8,7 @@ from time import time
 
 
 # function of each term in log scale
+# function of each term in log scale
 def f(theta: tuple, k: int):
     """
     terms of the normalization contant series
@@ -15,20 +16,13 @@ def f(theta: tuple, k: int):
     theta   : (log_lambda, nu)
     k       : k-th term
     """
-    theta = [mpf(x) for x in theta]
-
-    if k == 1:
-        return mpf(0)
-    elif (k == 2):
-        return theta[0]
-    else:
-        return (mpf(k)-1) * theta[0] - theta[1] * loggamma(mpf(k))
+    return (mpf(k)) * theta[0] - theta[1] * loggamma(mpf(k)+1)
 
 if __name__ == "__main__":
     mp.dps = 400
     M = 10**7
     eps = mpf(2)**mpf(-52)
-    initial_k = 1
+    initial_k = 0
     L = mpf(0)
 
     mu_l = 0
