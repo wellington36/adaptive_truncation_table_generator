@@ -5,8 +5,8 @@ from src.fixed_mp import fixed_mp
 # pip install /path/to/local/clone
 import pybind_stan_fns as psf
 
-from rpy2.robjects.packages import importr
 from mpmath import mp, mpf, log, exp, loggamma
+from rpy2.robjects.packages import importr
 from utils.utils import logdiffexp
 from tabulate import tabulate
 import math
@@ -20,13 +20,7 @@ def f(theta: tuple, k: int):
     theta   : (log_lambda, nu)
     k       : k-th term
     """
-
-    if k == 1:
-        return mpf(0)
-    elif (k == 2):
-        return theta[0]
-    else:
-        return (mpf(k)-1) * theta[0] - theta[1] * loggamma(mpf(k))
+    return (mpf(k)) * theta[0] - theta[1] * loggamma(mpf(k)+1)
 
 
 if __name__ == "__main__":
@@ -36,7 +30,7 @@ if __name__ == "__main__":
     nu = [mpf("0.1"), mpf("0.01"), mpf("0.001"), mpf("0.0001")]
     lamb = [mu[i]**nu[i] for i in range(0,4)]
     loglamb = [log(x) for x in lamb]
-    initial_k = 1
+    initial_k = 0
     M = [10**4, 10**5, 10**5, 3*10**5]
 
     # error = 2.2x10^-10

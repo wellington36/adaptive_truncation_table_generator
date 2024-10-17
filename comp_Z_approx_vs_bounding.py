@@ -14,13 +14,7 @@ def f(theta: tuple, k: int):
     theta   : (log_lambda, nu)
     k       : k-th term
     """
-
-    if k == 1:
-        return mpf(0)
-    elif (k == 2):
-        return theta[0]
-    else:
-        return (mpf(k)-1) * theta[0] - theta[1] * loggamma(mpf(k))
+    return (mpf(k)) * theta[0] - theta[1] * loggamma(mpf(k)+1)
 
 def log_Z_comp_approx_max(log_lambda, nu):
     log_lambda = mpf(log_lambda)
@@ -49,7 +43,7 @@ if __name__ == '__main__':
     M = 10**5
     L = 0
     eps = mpf(2)**mpf(-52)
-    initial_k = 1
+    initial_k = 0
 
     lamb = [mpf('1.5'), mpf('1.5')+eps*10**10, mpf('1.5'), mpf(5), mpf('1.5'), mpf(5)]
     nu = [mpf(1), mpf(1), mpf(1)+eps*10**10, mpf('0.8'), mpf(2), mpf(2)]
@@ -63,15 +57,15 @@ if __name__ == '__main__':
         print(f"Init: lambda = {float(lamb[i])} | nu = {float(nu[i])}")
         # test bounding pairs
         t0_bound = time.time()
-        k, log_Z_bound = bounding_pairs_mp(f, (log(lamb[i]), nu[i]), M, L, eps, initial_k)
+        k, log_Z_bound = bounding_pairs_mp(f, (log(lamb[i]), nu[i]), M, L, eps, initial_k=initial_k)
         t1_bound = time.time() - t0_bound
 
         t0_bound = time.time()
-        _, _ = bounding_pairs_mp(f, (log(lamb[i]), nu[i]), M, L, eps, initial_k)
+        _, _ = bounding_pairs_mp(f, (log(lamb[i]), nu[i]), M, L, eps, initial_k=initial_k)
         t2_bound = time.time() - t0_bound
 
         t0_bound = time.time()
-        _, _ = bounding_pairs_mp(f, (log(lamb[i]), nu[i]), M, L, eps, initial_k)
+        _, _ = bounding_pairs_mp(f, (log(lamb[i]), nu[i]), M, L, eps, initial_k=initial_k)
         t3_bound = time.time() - t0_bound
 
         # test approximations
@@ -89,11 +83,11 @@ if __name__ == '__main__':
 
         # true
         print("Fixed evaluation...")
-        _, fixed = fixed_mp(f, (log(lamb[i]), nu[i]), M, initial_k)
+        _, fixed = fixed_mp(f, (log(lamb[i]), nu[i]), M, initial_k=initial_k)
 
         # storage variables
         bounding_pairs_error.append((f"{float(exp(logdiffexp(log_Z_bound, fixed)))} / {k}"))
-        approx_error.append(exp(logdiffexp(log_Z_approx, fixed)))
+        approx_error.append(float(exp(logdiffexp(log_Z_approx, fixed))))
 
         bounding_pairs_time.append((t1_bound + t2_bound + t3_bound)/3)
         approx_time.append((t1_approx + t2_approx + t3_approx)/3)
