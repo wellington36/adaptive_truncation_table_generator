@@ -69,5 +69,4 @@ python p_series_iterations.py
 
 - Table of mcmc (made in https://github.com/wellington36/MCMC_COMPoisson)
 
-![image](https://github.com/user-attachments/assets/fd1303ab-a146-4350-8909-410183cd0fad)
-
+![Uploading image.png…]()
