@@ -12,7 +12,7 @@ Run (check if auxiliary libraries are installed):
 python comp_Z_iterations.py
 ```
 
-![image](https://github.com/user-attachments/assets/0455d6f9-36d7-4713-80b4-26bfb2e95ef9)
+![image](https://github.com/user-attachments/assets/4e9c581d-a9f5-4d73-95f7-874b2daa066f)
 
 
 - `comp_Z_errors.py`, has dependency:
@@ -26,7 +26,7 @@ Run (check if auxiliary libraries are installed):
 ```bash
 python comp_Z_errors.py
 ```
-![image](https://github.com/user-attachments/assets/1c944657-f6f2-4221-a7ef-16af12c7c9db)
+![image](https://github.com/user-attachments/assets/74f3cb00-c63f-4f90-b81f-ca4fcc0976d9)
 
 
 
@@ -40,7 +40,7 @@ Run:
 python domination_bp_over_stt.py
 ```
 
-![image](https://github.com/user-attachments/assets/b3a2b72a-5471-40ce-8ab2-82f271a20f0b)
+![image](https://github.com/user-attachments/assets/8477a9e9-c1b0-4390-b374-350858f3fc6c)
 
 - `comp_Z_approx_vs_bounding.py`, has dependency:
   - `src/bounding_pairs_mp.py`: The Bounding pairs approach with mpmath structure;
@@ -52,7 +52,7 @@ Run:
 python comp_Z_approx_vs_bounding.py
 ```
 
-![image](https://github.com/user-attachments/assets/2fd09dd4-2287-4a0c-8a46-4270566a5897)
+![image](https://github.com/user-attachments/assets/a1814353-ccf8-4ece-8a24-925b344af599)
 
 - `p_series_iterations.py`, has dependency:
   - `src/integration_bound_mp.py`: The Bounding pairs with integral test approach with mpmath structure;
@@ -69,5 +69,4 @@ python p_series_iterations.py
 
 - Table of mcmc (made in https://github.com/wellington36/MCMC_COMPoisson)
 
-![image](https://github.com/user-attachments/assets/fd1303ab-a146-4350-8909-410183cd0fad)
-
+![image](https://github.com/user-attachments/assets/d973cc3f-673c-409f-90ef-0765b5dc5191)
