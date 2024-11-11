@@ -63,7 +63,11 @@ def ratio_fixed(lamb, r, eps, m, M, brute):
     check3 = 0
 
     if M == m:
-        return (exp(logdiffexp(brute, f_true((lamb, mpf(r)))) <= eps), 1, 1)
+        condition = exp(logdiffexp(brute, f_true((lamb, mpf(r)))) <= eps)
+        if condition:
+            return (1, 1, 1)
+        else:
+            return (0, 1, 1)
 
     _, aprox = fixed_mp(f, (lamb, mpf(r)), M=m, initial_k=r)
 
@@ -73,7 +77,7 @@ def ratio_fixed(lamb, r, eps, m, M, brute):
     if exp(logdiffexp(aprox, f_true((lamb, mpf(r))))) <= exp(logdiffexp(f_true((lamb, mpf(r))), brute)):
         check2 = 1
         
-    if (exp(logdiffexp(aprox, f_true((lamb, mpf(r))))) <= eps) or (exp(logdiffexp(aprox, f_true((lamb, mpf(r))))) <= exp(logdiffexp(f_true((lamb, mpf(r))), brute))):
+    if check1 or check2:
         check3 = 1
 
     return (check1, check2, check3)
