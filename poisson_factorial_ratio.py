@@ -2,7 +2,7 @@ from src.bounding_pairs_mp import bounding_pairs_mp
 from src.sum_to_threshold_mp import sum_to_threshold_mp
 from src.fixed_mp import fixed_mp
 
-from mpmath import mpf, log, exp, loggamma
+from mpmath import mp, mpf, log, exp, loggamma
 from utils.utils import logdiffexp
 from tabulate import tabulate
 
@@ -84,7 +84,7 @@ def ratio_fixed(lamb, r, eps, m, M, brute):
 
 
 if __name__ == "__main__":
-    #mp.dps = 100
+    mp.dps = 200
     machine_eps = mpf(2)**mpf(-52)
 
     lamblist = [mpf("0.5"), mpf(1), mpf(10), mpf(1000)]
