@@ -70,3 +70,16 @@ python p_series_iterations.py
 - Table of mcmc (made in https://github.com/wellington36/MCMC_COMPoisson)
 
 ![image](https://github.com/user-attachments/assets/d973cc3f-673c-409f-90ef-0765b5dc5191)
+
+- `poisson_factorial_ratio.py`, has dependency:
+  - `src/bounding_pairs_mp.py`: The Bounding pairs approach with mpmath structure;
+  - `src/sum_to_threshold_mp.py`: The Sum-to-threshold approach with mpmath structure;
+  - `src/fixed_mp.py`: Evaluate a fixed numbers of terms
+
+Run:
+
+```bash
+python poisson_factorial_ratio.py
+```
+
+![image](https://github.com/user-attachments/assets/e3bf0151-75c1-4c2b-89f6-ad04466d00b1)
