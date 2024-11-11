@@ -2,24 +2,13 @@ from src.bounding_pairs_mp import bounding_pairs_mp
 from src.sum_to_threshold_mp import sum_to_threshold_mp
 from src.fixed_mp import fixed_mp
 
-# pip install /path/to/local/clone
-import pybind_stan_fns as psf
-
-from rpy2.robjects.packages import importr
-from mpmath import mp, mpf, log, exp, loggamma
+from mpmath import mpf, log, exp, loggamma
 from utils.utils import logdiffexp
 from tabulate import tabulate
-import math
 
 
 # function of each term in log scale
 def f(theta: tuple, k: int):
-    """
-    terms of the normalization contant series
-
-    theta   : (lambda, r)
-    k       : k-th term
-    """
     lamb = mpf(theta[0])
     r = mpf(theta[1])
     k = mpf(k)
@@ -91,7 +80,7 @@ def ratio_fixed(lamb, r, eps, m, M, brute):
 
 
 if __name__ == "__main__":
-    mp.dps = 100
+    #mp.dps = 100
     machine_eps = mpf(2)**mpf(-52)
 
     lamblist = [mpf("0.5"), mpf(1), mpf(10), mpf(1000)]
