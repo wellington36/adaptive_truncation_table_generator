@@ -29,13 +29,15 @@ def f(theta: tuple, k: int):
 def f_true(theta):
     return theta[1] * log(theta[0])
 
-def ratio_bounding(lamb, r, eps, M):
+def ratio_bounding(lamb, r, eps, M, brute):
     check1 = 0
     check2 = 0
     check3 = 0
 
-    _, aprox = bounding_pairs_mp(f, (lamb, mpf(r)), L=0, eps=eps, M=M, initial_k=r)
-    _, brute = fixed_mp(f, (lamb, mpf(r)), M=M, initial_k=r)
+    k, aprox = bounding_pairs_mp(f, (lamb, mpf(r)), L=0, eps=eps, M=M, initial_k=r)
+
+    print(k)
+    print(exp(logdiffexp(aprox, f_true((lamb, mpf(r))))))
 
     if exp(logdiffexp(aprox, f_true((lamb, mpf(r))))) <= eps:
         check1 = 1
@@ -48,13 +50,12 @@ def ratio_bounding(lamb, r, eps, M):
 
     return (check1, check2, check3)
 
-def ratio_threshold(lamb, r, eps, M):
+def ratio_threshold(lamb, r, eps, M, brute):
     check1 = 0
     check2 = 0
     check3 = 0
 
     _, aprox = sum_to_threshold_mp(f, (lamb, mpf(r)), L=0, eps=eps, M=M, initial_k=r)
-    _, brute = fixed_mp(f, (lamb, mpf(r)), M=M, initial_k=r)
 
     if exp(logdiffexp(aprox, f_true((lamb, mpf(r))))) <= eps:
         check1 = 1
@@ -67,16 +68,15 @@ def ratio_threshold(lamb, r, eps, M):
 
     return (check1, check2, check3)
 
-def ratio_fixed(lamb, r, eps, m, M):
+def ratio_fixed(lamb, r, eps, m, M, brute):
     check1 = 0
     check2 = 0
     check3 = 0
 
     if M == m:
-        return (logdiffexp(fixed_mp(f, (lamb, mpf(r)), M=M, initial_k=r)[1], f_true((lamb, mpf(r)))) <= eps, 1, 1)
+        return (exp(logdiffexp(brute, f_true((lamb, mpf(r)))) <= eps), 1, 1)
 
     _, aprox = fixed_mp(f, (lamb, mpf(r)), M=m, initial_k=r)
-    _, brute = fixed_mp(f, (lamb, mpf(r)), M=M, initial_k=r)
 
     if exp(logdiffexp(aprox, f_true((lamb, mpf(r))))) <= eps:
         check1 = 1
@@ -89,8 +89,9 @@ def ratio_fixed(lamb, r, eps, m, M):
 
     return (check1, check2, check3)
 
+
 if __name__ == "__main__":
-    mpf.dps = 200
+    mp.dps = 100
     machine_eps = mpf(2)**mpf(-52)
 
     lamblist = [mpf("0.5"), mpf(1), mpf(10), mpf(1000)]
@@ -106,21 +107,23 @@ if __name__ == "__main__":
 
     for lamb in lamblist:
         for r in rlist:
+            _, brute = fixed_mp(f, (lamb, mpf(r)), M=M, initial_k=r)
+
             for eps in epslist:
                 print(f"Evaluating: lambda={lamb}, r={r}, eps={float(eps)}...")
                 
-                ratios_bounding = [sum(i) for i in zip(ratios_bounding, ratio_bounding(lamb, r, eps, M))]
+                ratios_bounding = [sum(i) for i in zip(ratios_bounding, ratio_bounding(lamb, r, eps, M, brute))]
                 print(ratios_bounding)
-                ratios_threshold = [sum(i) for i in zip(ratios_threshold, ratio_threshold(lamb, r, eps, M))]
+                ratios_threshold = [sum(i) for i in zip(ratios_threshold, ratio_threshold(lamb, r, eps, M, brute))]
                 print(ratios_threshold)
-                ratios_cap_m = [sum(i) for i in zip(ratios_cap_m, ratio_fixed(lamb, r, eps, m, M))]
+                ratios_cap_m = [sum(i) for i in zip(ratios_cap_m, ratio_fixed(lamb, r, eps, m, M, brute))]
                 print(ratios_cap_m)
-                ratios_cap_M = [sum(i) for i in zip(ratios_cap_M, ratio_fixed(lamb, r, eps, M, M))]
+                ratios_cap_M = [sum(i) for i in zip(ratios_cap_M, ratio_fixed(lamb, r, eps, M, M, brute))]
                 print(ratios_cap_M)
 
     Steps = len(lamblist) * len(rlist) * len(epslist)
 
-    ratios_bounding = [x/Steps for x in ratios_threshold]
+    ratios_bounding = [x/Steps for x in ratios_bounding]
     ratios_threshold = [x/Steps for x in ratios_threshold]
     ratios_cap_m = [x/Steps for x in ratios_cap_m]
     ratios_cap_M = [x/Steps for x in ratios_cap_M]
@@ -129,12 +132,9 @@ if __name__ == "__main__":
     ratios = [ratios_bounding, ratios_threshold, ratios_cap_m, ratios_cap_M]
 
     data = []
-    for idx, (a) in enumerate(zip(ratios)):
+    for idx, (a) in enumerate(ratios):
         data.append([f"{methods[idx]}", a[0], a[1], a[2]])
 
     headers = ["", "Error", "Error with M", "Either"]
 
     print(tabulate(data, headers, tablefmt="fancy_grid"))
-
-
-    #print(ratio_bounding(lamb[3], r[2], eps[0], M, N))
