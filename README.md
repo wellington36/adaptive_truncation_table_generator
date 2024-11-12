@@ -70,3 +70,29 @@ python p_series_iterations.py
 - Table of mcmc (made in https://github.com/wellington36/MCMC_COMPoisson)
 
 ![image](https://github.com/user-attachments/assets/3768093d-a49d-46e7-b940-79a3f373d1fd)
+
+- `poisson_factorial_ratio.py`, has dependency:
+  - `src/bounding_pairs_mp.py`: The Bounding pairs approach with mpmath structure;
+  - `src/sum_to_threshold_mp.py`: The Sum-to-threshold approach with mpmath structure;
+  - `src/fixed_mp.py`: Evaluate a fixed numbers of terms
+
+Run:
+
+```bash
+python poisson_factorial_ratio.py
+```
+
+![image](https://github.com/user-attachments/assets/e3bf0151-75c1-4c2b-89f6-ad04466d00b1)
+
+- `negative_binomial_model.py`, has dependency:
+  - `src/bounding_pairs_mp.py`: The Bounding pairs approach with mpmath structure;
+  - `src/sum_to_threshold_mp.py`: The Sum-to-threshold approach with mpmath structure;
+  - `src/fixed_mp.py`: Evaluate a fixed numbers of terms
+
+Run:
+
+```bash
+python negative_binomial_model.py
+```
+
+![image](https://github.com/user-attachments/assets/f9b6133c-bd1d-4d8b-bb2e-7091ef99e526)
