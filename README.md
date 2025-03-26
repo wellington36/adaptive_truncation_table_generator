@@ -69,7 +69,7 @@ python p_series_iterations.py
 
 - Table of mcmc (made in https://github.com/wellington36/MCMC_COMPoisson)
 
-![image](https://github.com/user-attachments/assets/3768093d-a49d-46e7-b940-79a3f373d1fd)
+![image](https://github.com/user-attachments/assets/5a131b91-1fde-4ff9-b7d8-fe98cf06749f)
 
 - `poisson_factorial_ratio.py`, has dependency:
   - `src/bounding_pairs_mp.py`: The Bounding pairs approach with mpmath structure;
