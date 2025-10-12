@@ -4,7 +4,8 @@ from mpmath import mp, exp, log, fsum, fmul, fabs, inf, eps, expm1
 def logsumexp(a: list):
     a_max = max(a)
 
-    return a_max + log(fsum([exp(ai - a_max) for ai in a]))
+    with mp.extradps(200): 
+        return a_max + log(fsum([exp(ai - a_max) for ai in a]))
 
 def fma(a, b, c):
     with mp.extradps(100):  # Extra precision for more accurate result
