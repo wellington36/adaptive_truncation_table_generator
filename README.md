@@ -7,7 +7,7 @@
   - `src/fixed_mp.py`: Evaluate a fixed numbers of terms
   - `stan/comp_Z_brms_fixed.stan`: The COM-Poisson normalising constant by brms with index error corrected and M increased from _10^4_ to _10^6_;
 
-Run (check if auxiliary libraries are installed):
+Run (check if auxiliary libraries are installed and the library [WardBrian/pybind_expose_stan_fns](https://github.com/WardBrian/pybind_expose_stan_fns)):
 ```bash
 python comp_Z_iterations.py
 ```
