@@ -23,7 +23,7 @@ def ratio_bounding(lamb, r, eps, M, brute):
     check2 = 0
     check3 = 0
 
-    k, aprox = bounding_pairs_mp(f, (lamb, mpf(r)), L=0, eps=eps, M=M, initial_k=r)
+    k, aprox = bounding_pairs_mp(f, (lamb, mpf(r)), L=0, eps=eps, M=M, initial_k=r, bucket_size=1)
 
     print(k)
     print(exp(logdiffexp(aprox, f_true((lamb, mpf(r))))))

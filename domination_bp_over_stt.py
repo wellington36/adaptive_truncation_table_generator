@@ -21,7 +21,7 @@ if __name__ == "__main__":
     bp_terms = [None] * len(a)
     percentage = [None] * len(a)
     for i in range(len(a)):
-        bp_terms[i] = bounding_pairs_mp(f, (a[i]), M[i], L[i], mpf(2)**mpf(-52), initial_k, bucket_size = 1)[0]
+        bp_terms[i] = bounding_pairs_mp(f, (a[i]), M[i], L[i], mpf(2)**mpf(-52), initial_k, bucket_size=1)[0]
         stt_terms[i] = sum_to_threshold_mp(f, (a[i]), M[i], L[i], mpf(2)**mpf(-52), initial_k)[0]
         percentage[i] = bp_terms[i]/stt_terms[i] - 1
     

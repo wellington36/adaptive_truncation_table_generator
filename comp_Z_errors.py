@@ -38,7 +38,7 @@ if __name__ == "__main__":
     error_minus_10 = []
     for i in range(len(mu)):
         fixed_value = fixed_mp(f, (loglamb[i], nu[i]), M[i], initial_k=initial_k)[1]
-        bp_iter = bounding_pairs_mp(f, (loglamb[i], nu[i]), M[i], mpf(0), error, initial_k=initial_k)[1]
+        bp_iter = bounding_pairs_mp(f, (loglamb[i], nu[i]), M[i], mpf(0), error, initial_k=initial_k, bucket_size=1)[1]
         sequential_iter = sequential_mp(f, (loglamb[i],nu[i]), M[i], error, initial_k=initial_k)[1]
 
         error_minus_10.append([exp(logdiffexp(sequential_iter, fixed_value)), exp(logdiffexp(bp_iter, fixed_value))])
@@ -48,7 +48,7 @@ if __name__ == "__main__":
     error_minus_16 = []
     for i in range(len(mu)):
         fixed_value = fixed_mp(f, (loglamb[i], nu[i]), M[i], initial_k=initial_k)[1]
-        bp_iter = bounding_pairs_mp(f, (loglamb[i], nu[i]), M[i], mpf(0), error, initial_k=initial_k)[1]
+        bp_iter = bounding_pairs_mp(f, (loglamb[i], nu[i]), M[i], mpf(0), error, initial_k=initial_k, bucket_size=1)[1]
         sequential_iter = sequential_mp(f, (loglamb[i],nu[i]), M[i], error, initial_k=initial_k)[1]
 
         error_minus_16.append([exp(logdiffexp(sequential_iter, fixed_value)), exp(logdiffexp(bp_iter, fixed_value))])

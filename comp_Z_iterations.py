@@ -37,7 +37,7 @@ if __name__ == "__main__":
     error = mpf(2)**mpf(-52) * 10**6
     error_minus_10 = []
     for i in range(len(mu)):
-        bp_iter = bounding_pairs_mp(f, (loglamb[i], nu[i]), M[i], mpf(0), error, initial_k)[0]
+        bp_iter = bounding_pairs_mp(f, (loglamb[i], nu[i]), M[i], mpf(0), error, initial_k, bucket_size=1)[0]
         sequential_iter = sequential_mp(f, (loglamb[i],nu[i]), M[i], error, initial_k)[0]
 
         error_minus_10.append([sequential_iter, bp_iter])
@@ -46,7 +46,7 @@ if __name__ == "__main__":
     error = mpf(2)**mpf(-52)
     error_minus_16 = []
     for i in range(len(mu)):
-        bp_iter = bounding_pairs_mp(f, (loglamb[i], nu[i]), M[i], mpf(0), error, initial_k)[0]
+        bp_iter = bounding_pairs_mp(f, (loglamb[i], nu[i]), M[i], mpf(0), error, initial_k, bucket_size=1)[0]
         sequential_iter = sequential_mp(f, (loglamb[i],nu[i]), M[i], error, initial_k)[0]
 
         error_minus_16.append([sequential_iter, bp_iter])

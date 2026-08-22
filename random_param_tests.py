@@ -43,7 +43,7 @@ if __name__ == "__main__":
 
         theta = (loglamb, nu)
 
-        k, bp_value = bounding_pairs_mp(f, theta, M, L, eps, initial_k)
+        k, bp_value = bounding_pairs_mp(f, theta, M, L, eps, initial_k, bucket_size=1)
 
         fixed_value = fixed_mp(f, theta, M=k*10, initial_k=initial_k)[1]
 

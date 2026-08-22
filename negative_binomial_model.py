@@ -34,7 +34,7 @@ def ratio_bounding(phi, mu, x, eta, eps, M, L, brute):
     check2 = 0
     check3 = 0
 
-    k, aprox = bounding_pairs_mp(f, (phi, mu, mpf(x), eta), L=L, eps=eps, M=M, initial_k=x)
+    k, aprox = bounding_pairs_mp(f, (phi, mu, mpf(x), eta), L=L, eps=eps, M=M, initial_k=x, bucket_size=1)
 
     print(k)
     print(exp(logdiffexp(aprox, f_true((phi, mu, mpf(x), eta)))))

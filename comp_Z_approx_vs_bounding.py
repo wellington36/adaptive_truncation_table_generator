@@ -57,15 +57,15 @@ if __name__ == '__main__':
         print(f"Init: lambda = {float(lamb[i])} | nu = {float(nu[i])}")
         # test bounding pairs
         t0_bound = time.time()
-        k, log_Z_bound = bounding_pairs_mp(f, (log(lamb[i]), nu[i]), M, L, eps, initial_k=initial_k)
+        k, log_Z_bound = bounding_pairs_mp(f, (log(lamb[i]), nu[i]), M, L, eps, initial_k=initial_k, bucket_size=1)
         t1_bound = time.time() - t0_bound
 
         t0_bound = time.time()
-        _, _ = bounding_pairs_mp(f, (log(lamb[i]), nu[i]), M, L, eps, initial_k=initial_k)
+        _, _ = bounding_pairs_mp(f, (log(lamb[i]), nu[i]), M, L, eps, initial_k=initial_k, bucket_size=1)
         t2_bound = time.time() - t0_bound
 
         t0_bound = time.time()
-        _, _ = bounding_pairs_mp(f, (log(lamb[i]), nu[i]), M, L, eps, initial_k=initial_k)
+        _, _ = bounding_pairs_mp(f, (log(lamb[i]), nu[i]), M, L, eps, initial_k=initial_k, bucket_size=1)
         t3_bound = time.time() - t0_bound
 
         # test approximations
@@ -86,7 +86,7 @@ if __name__ == '__main__':
         _, fixed = fixed_mp(f, (log(lamb[i]), nu[i]), M, initial_k=initial_k)
 
         # storage variables
-        bounding_pairs_error.append((f"{float(exp(logdiffexp(log_Z_bound, fixed)))} / {k}"))
+        bounding_pairs_error.append(f"{float(exp(logdiffexp(log_Z_bound, fixed)))} / {k}")
         approx_error.append(float(exp(logdiffexp(log_Z_approx, fixed))))
 
         bounding_pairs_time.append((t1_bound + t2_bound + t3_bound)/3)
