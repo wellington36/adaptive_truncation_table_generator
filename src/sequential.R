@@ -16,12 +16,8 @@ sequential <- function(f, theta, M, eps, initial_k = 0L, prec = 64L) {
   term <- function(k) mpfr(f(theta, k), prec)
 
   # --- Compute the brute-force approximation with M terms ---
-  log_terms_brute <- mpfr(rep(-Inf, M + 1L), prec)
-
-  for (k in seq.int(initial_k, M + initial_k)) {
-    log_terms_brute[k - initial_k + 1L] <- term(k)
-  }
-
+  ks <- seq.int(initial_k, initial_k + M)
+  log_terms_brute <- do.call(c, lapply(ks, term))
   log_sum_brute <- logsumexp(log_terms_brute, prec = prec)
 
   # --- Compute the terms until we reach the approximation ---
