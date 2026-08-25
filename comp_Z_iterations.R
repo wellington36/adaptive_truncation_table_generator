@@ -81,12 +81,11 @@ run_comparison <- function() {
     c(brms = exp(logdiffexp(fixed_value, brms_value)),
       COMPoissonReg = exp(logdiffexp(fixed_value, -compoissonreg_log_pmf0)))
   })
-
+  
   rows <- lapply(seq_along(mu), function(i) {
     c(sprintf("mu=%g | nu=%g", mu[i], nu[i]),
       error_minus_10[[i]][["sequential"]], error_minus_10[[i]][["BP"]],
       error_minus_16[[i]][["sequential"]], error_minus_16[[i]][["BP"]],
-      print(libraries)
       format_result(libraries[[i]][["brms"]]),
       format_result(libraries[[i]][["COMPoissonReg"]]))
   })
