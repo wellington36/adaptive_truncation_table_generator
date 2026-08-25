@@ -30,22 +30,25 @@ f <- function(theta, k) {
 }
 
 format_result <- function(x) {
+  if (inherits(x, "mpfr")) {
+    x <- Rmpfr::asNumeric(x)
+  }
   if (is.infinite(x) && x < 0) return("-Inf")
   formatC(x, format = "g", digits = 8)
 }
 
 run_comparison <- function() {
-  #mu <- c(10, 100, 1000, 10000)
-  mu <- c(10, 100, 1000)
-  #nu <- c(0.1, 0.01, 0.001, 0.0001)
-  nu <- c(0.1, 0.01, 0.001)
+  mu <- c(10, 100, 1000, 10000)
+  #mu <- c(10, 100, 1000)
+  nu <- c(0.1, 0.01, 0.001, 0.0001)
+  #nu <- c(0.1, 0.01, 0.001)
   lambda <- mu^nu
   log_lambda <- log(lambda)
-  #M <- c(10^4L, 10^5L, 10^5L, 3 * 10^5L)
-  M <- c(10000L, 10000L, 10000L)
+  M <- c(10^4L, 10^5L, 10^5L, 3 * 10^5L)
+  #M <- c(10000L, 10000L, 10000L)
   initial_k <- 0L
   prec <- 128L
-  eps <- 2^-10
+  eps <- 2^-52
 
   error_minus_10 <- lapply(seq_along(mu), function(i) {
     bp <- bounding_pairs(f, c(log_lambda[i], nu[i]), M[i], 0, eps * 10^6,
@@ -74,12 +77,12 @@ run_comparison <- function() {
   libraries <- lapply(seq_along(mu), function(i) {
     fixed_value <- fixed(f, c(log_lambda[i], nu[i]), M[i], initial_k, prec = prec)$value
 
-    brms_value <- log_z_com_poisson(log(mu[i]), nu[i])
+    brms_value <- log_Z_com_poisson(log(mu[i]), nu[i])
 
     compoissonreg_log_pmf0 <- log(dcmp(0, lambda[i], nu[i]))
-    
-    c(brms = exp(logdiffexp(fixed_value, brms_value)),
-      COMPoissonReg = exp(logdiffexp(fixed_value, -compoissonreg_log_pmf0)))
+
+    list(brms = exp(logdiffexp(fixed_value, brms_value)),
+         COMPoissonReg = exp(logdiffexp(fixed_value, -compoissonreg_log_pmf0)))
   })
   
   rows <- lapply(seq_along(mu), function(i) {
