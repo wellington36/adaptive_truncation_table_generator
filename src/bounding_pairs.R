@@ -1,11 +1,9 @@
+library(Rmpfr)
+
 project_root_local <- if (exists("project_root", inherits = TRUE)) project_root else getwd()
 source(file.path(project_root_local, "utils", "utils.R"))
 
 bounding_pairs <- function(f, theta, M, L, eps, initial_k = 0L, bucket_size = 20L, prec = 64L) {
-  if (!requireNamespace("Rmpfr", quietly = TRUE)) {
-    stop("Package 'Rmpfr' is required.")
-  }
-
   prec <- as.integer(prec)
   k <- as.integer(initial_k)
   M <- as.integer(M)

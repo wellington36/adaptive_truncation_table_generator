@@ -1,12 +1,10 @@
+library(Rmpfr)
+
 project_root_local <- if (exists("project_root", inherits = TRUE)) project_root else getwd()
 source(file.path(project_root_local, "utils", "utils.R"))
 
 fixed <- function(f, theta, M, initial_k = 0L, prec = 64L) {
   # Compute a fixed number of iterations of the log-sum using Rmpfr.
-
-  if (!requireNamespace("Rmpfr", quietly = TRUE)) {
-    stop("Package 'Rmpfr' is required.")
-  }
 
   prec <- as.integer(prec)
   initial_k <- as.integer(initial_k)

@@ -1,12 +1,9 @@
+library(Rmpfr)
+
 project_root_local <- if (exists("project_root", inherits = TRUE)) project_root else getwd()
 source(file.path(project_root_local, "utils", "utils.R"))
 
 sequential <- function(f, theta, M, eps, initial_k = 0L, prec = 64L) {
-  # Approximate the sum with M terms and then evaluate iterations until
-  # reaching the error with the approximated sum, using Rmpfr.
-  if (!requireNamespace("Rmpfr", quietly = TRUE)) {
-    stop("Package 'Rmpfr' is required.")
-  }
   prec <- as.integer(prec)
   M <- as.integer(M)
   initial_k <- as.integer(initial_k)
