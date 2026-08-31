@@ -1,11 +1,10 @@
 library(rstan)
-library(COMPoissonReg)
 library(dplyr)
-# Optional packages used for formatted output.
 library(knitr)
 library(kableExtra)
+library(COMPoissonReg)
 
-# MCMC settings.
+# MCMC settings
 iterations <- 5000
 max_iters <- 10^4
 eps <- 2^(-52)
@@ -27,6 +26,7 @@ data_df <- data.frame(
 ) %>%
   arrange(count)
 
+# Inspect the data
 print(data_df)
 
 # Validate the required columns and their values.
@@ -66,6 +66,7 @@ fit <- sampling(
 # Print the posterior summary for all model parameters and generated quantities.
 parameters <- c("mu", "nu", "zi", "n")
 print(fit, pars = parameters)
+
 summary_fit <- summary(fit, pars = parameters)
 posterior_stats <- as.data.frame(summary_fit$summary)
 
@@ -95,7 +96,6 @@ summary_table <- data.frame(
 )
 print(summary_table)
 
-# Optional HTML rendering of the summary table.
 summary_table %>%
   kable(
     format = "html",

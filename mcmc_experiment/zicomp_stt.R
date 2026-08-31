@@ -1,7 +1,7 @@
 library(rstan)
 library(readr)
 library(dplyr)
-library(ggplot2)
+library(kableExtra)
 library(COMPoissonReg)
 
 iterations = 5000

@@ -1,10 +1,13 @@
 library(rstan)
 library(readr)
 library(dplyr)
-library(ggplot2)
+library(knitr)
+library(kableExtra)
 
-iterations = 5000
-eps = 2**(-52)
+# MCMC settings
+iterations <- 5000
+max_iters <- 10^4
+eps <- 2^(-52)
 
 # Set rstan options for better performance
 rstan_options(auto_write = TRUE)
@@ -29,30 +32,32 @@ stan_data <- list(
   y = counts,
   freq = frequencies,
   eps = eps,
-  MAX_ITERS = 10**4
+  MAX_ITERS = max_iters
 )
 
 # Compile the Stan model
 stan_model <- stan_model(file = "stan/double-poisson_bounding.stan")
 
-# Fit the model using MCMC
+# Fit the model using MCMC.
 fit <- sampling(
   object = stan_model,
   data = stan_data,
-  refresh = floor(iterations/5),
-  iter = 2*iterations,               # Number of iterations
-  warmup = iterations,    # Number of warmup (burn-in) iterations
-  chains = 4,                      # Number of chains
-  cores = 8,
-  control = list(adapt_delta = 0.90, max_treedepth = 12)  # Control parameters
+  refresh = floor(iterations / 5),
+  iter = 2 * iterations,
+  warmup = iterations,
+  chains = 4,
+  cores = min(4, parallel::detectCores()),
+  control = list(
+    adapt_delta = 0.90,
+    max_treedepth = 12
+  )
 )
 
 # Print a summary of the results
-print(fit, pars = c("mu", "phi", "n"))
+parameters <- c("mu", "phi", "n")
+print(fit, pars = parameters)
 
-summary_fit <- summary(fit, pars = c("mu", "phi", "n"))
-
-# Convert the summary output to a data frame
+summary_fit <- summary(fit, pars = parameters)
 posterior_stats <- as.data.frame(summary_fit$summary)
 
 # Get elapsed time for each chain
@@ -65,24 +70,34 @@ avg_time_min <- mean(rowSums(chain_times)) / 60
 ess_per_minute <- posterior_stats$n_eff / avg_time_min
 
 
-# Create a summary table for mu and phi
+# Create a compact posterior summary table.
 summary_table <- data.frame(
-  Parameter = c("mu", "phi", "n"),
+  Parameter = parameters,
   Mean = posterior_stats$mean,
   Median = posterior_stats$`50%`,
-  `95% BCI` = paste0("[", round(posterior_stats$`2.5%`, 3), ", ", round(posterior_stats$`97.5%`, 3), "]"),
+  `95% BCI` = paste0(
+    "[",
+    round(posterior_stats$`2.5%`, 3),
+    ", ",
+    round(posterior_stats$`97.5%`, 3),
+    "]"
+  ),
   `Posterior SD` = posterior_stats$sd,
   MCSE = posterior_stats$se_mean,
-  `ESS/minute` = ess_per_minute
+  `ESS/minute` = ess_per_minute,
+  check.names = FALSE
 )
-
-# Display the summary table
 print(summary_table)
 
-# Optional: Format the table for display
-library(knitr)
-library(kableExtra)
-
 summary_table %>%
-  kable("html", col.names = c("Parameter", "Mean", "Median", "95% BCI", "Posterior SD", "MCSE", "ESS/minute")) %>%
-  kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
+  kable(
+    format = "html",
+    col.names = c(
+      "Parameter", "Mean", "Median", "95% BCI",
+      "Posterior SD", "MCSE", "ESS/minute"
+    )
+  ) %>%
+  kable_styling(
+    full_width = FALSE,
+    bootstrap_options = c("striped", "hover")
+  )
