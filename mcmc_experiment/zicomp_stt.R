@@ -2,6 +2,7 @@ library(rstan)
 library(readr)
 library(dplyr)
 library(kableExtra)
+library(kableExtra)
 library(COMPoissonReg)
 
 iterations = 5000
@@ -90,7 +91,6 @@ summary_table <- data.frame(
 )
 print(summary_table)
 
-# Optional HTML rendering of the summary table.
 summary_table %>%
   kable(
     format = "html",
