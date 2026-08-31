@@ -1,7 +1,8 @@
 library(rstan)
 library(readr)
 library(dplyr)
-library(ggplot2)
+library(knitr)
+library(kableExtra)
 
 iterations = 5000
 FIXED = 3300
@@ -76,10 +77,6 @@ summary_table <- data.frame(
 
 # Display the summary table
 print(summary_table)
-
-# Optional: Format the table for display
-library(knitr)
-library(kableExtra)
 
 summary_table %>%
   kable("html", col.names = c("Parameter", "Mean", "Median", "95% BCI", "Posterior SD", "MCSE", "ESS/minute")) %>%
