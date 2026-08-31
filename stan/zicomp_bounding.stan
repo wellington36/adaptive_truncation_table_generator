@@ -6,7 +6,7 @@ functions {
 
   // Calculate log(Z) by summing COM-Poisson mass terms in log space.
   // The second returned value is the number of terms used.
-  array[] real infinite_bounding_pairs(
+  array[] real infiniteBoundingPairs(
     real log_lambda,
     real nu,
     real epsilon,
@@ -60,7 +60,7 @@ transformed parameters {
   array[2] real bounding_pair;
 
   log_lambda = nu * log(mu);
-  bounding_pair = infinite_bounding_pairs(log_lambda, nu, eps, MAX_ITERS);
+  bounding_pair = infiniteBoundingPairs(log_lambda, nu, eps, MAX_ITERS);
   log_Z = bounding_pair[1];
   n = bounding_pair[2];
 }

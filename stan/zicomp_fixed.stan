@@ -32,7 +32,6 @@ parameters {
 transformed parameters {
   real log_lambda;
   real log_Z;
-  real n;
 
   log_lambda = nu * log(mu);
   log_Z = sequential(log_lambda, nu, FIXED);
