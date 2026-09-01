@@ -27,6 +27,7 @@ log_term_dp <- function(theta, n) {
   mu <- theta[1]; phi <- theta[2]
   if (n == 0) return(0.5 * log(phi) - phi * mu)
   n <- as.numeric(n)
+  #Z <- log(1 + (1 - phi)/(12*mu*phi) * (1 + 1/(phi*mu)) ) # better approximation for norm const
   n * log(n) - n - lgamma(n + 1) + phi * n * (1 + log(mu) - log(n)) + 0.5 * log(phi) - phi * mu
 }
  
