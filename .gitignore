@@ -4,5 +4,7 @@ __pycache__
 
 sandbox*
 
+figures
+
 *.rds
 comp_Z_brms_fixed
