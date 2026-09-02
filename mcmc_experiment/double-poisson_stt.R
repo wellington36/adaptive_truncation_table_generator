@@ -11,14 +11,17 @@ eps = 2**(-52)
 rstan_options(auto_write = TRUE)
 options(mc.cores = parallel::detectCores())
 
-# Read your CSV data
-data_df <- read_csv("data/Shmuelli_2005.csv")
+# Read the fertility data (Winkelmann 1995 / German Socio-Economic Panel, via Countr::fertility)
+# One row per woman; the response variable is `children`, not pre-aggregated
+data_df <- read_csv("data/fertility.csv")
 
 # Inspect the data
 print(data_df)
 
-# Prepare data for Stan
+# Aggregate to (count, frequency) pairs, matching the structure the Stan model expects
 data_df <- data_df %>%
+  count(children, name = "frequency") %>%
+  rename(count = children) %>%
   arrange(count)
 
 counts <- data_df$count

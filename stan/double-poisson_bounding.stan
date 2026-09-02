@@ -40,7 +40,7 @@ data {
 }
 
 parameters {
-  real mu;              // Mean parameter (mu)
+  real<lower=0> mu;              // Mean parameter (mu)
   real<lower=0> phi;              // Dispersion parameter (phi)
 }
 
@@ -52,12 +52,10 @@ transformed parameters {
 }
 
 model {
-  vector[N] log_p;          // Log probabilities for each count
-  // Priors (adjust these based on your knowledge)
-  mu ~ normal(0, 5);            // Prior for mu
-  phi ~ uniform(0, 10);        // Prior for phi
-  
-  // Compute log probabilities
+  vector[N] log_p;
+  mu ~ normal(0, 5);
+  phi ~ uniform(0, 10);
+
   for (j in 1:N) {
     log_p[j] = log_kernel(mu, phi, y[j]) - logZ;
     target += freq[j] * log_p[j];
