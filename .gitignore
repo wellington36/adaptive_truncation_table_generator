@@ -5,6 +5,8 @@ __pycache__
 sandbox*
 
 figures
+comp_moments_results
+hyperpoisson_numbids_results
 
 *.rds
 comp_Z_brms_fixed
