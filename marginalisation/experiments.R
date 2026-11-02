@@ -1,5 +1,6 @@
 suppressPackageStartupMessages({
   library(ggplot2); library(dplyr); library(tidyr); library(purrr); library(tibble)
+  library(progress)
 })
 
 # Stable log PMF of total progeny J for NB offspring.
