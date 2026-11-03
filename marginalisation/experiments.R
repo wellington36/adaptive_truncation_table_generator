@@ -141,7 +141,8 @@ fit_model <- function(y, method, J = 1000L, eps_ll = 1e-7, max_n = 1e6L,
 run_simulation <- function(B = 200L, m = 500L, seed = 42L,
                            eps_ll = 1e-7, fixed_J = c(50L, 200L, 1000L)) {
 
-  grid <- expand_grid(R0 = c(.9), k = c(1.1), p_sent = c(.01, .1, .5))
+  grid <- expand_grid(R0 = c(0.2, 0.5, 0.9), k = c(0.2, 1, 10),
+                      p_sent = c(.01, .1, .5))
 
   total_optim <- nrow(grid) * B * (2L + length(fixed_J))
 
@@ -217,45 +218,98 @@ summarise_simulation <- function(res) {
 
 plot_simulation <- function(summary_tbl, file = "experiment1_accuracy_cost.png") {
   p <- ggplot(
-  summary_tbl,
-  aes(x = method, y = p95_abs_ll_error, color = method,
-      group = 1)
-) +
-  geom_line(linewidth = .5) +
-  geom_point(size = 2) +
-  facet_grid(k ~ R0, labeller = label_both) +
-  scale_y_log10() +
-  labs(
-    x = NULL,
-    y = "95th percentile absolute log-likelihood error (log scale)",
-    title = "Likelihood accuracy across simulation regimes",
-    subtitle = "Reference fits must be independently checked for numerical stability"
+    summary_tbl,
+    aes(x = method, y = p95_abs_ll_error, color = method, group = 1)
   ) +
-  theme_minimal(base_size = 11) +
-  theme(
-    legend.position = "none",
-    axis.text.x = element_text(angle = 35, hjust = 1)
-  )
-  ggsave(file, p, width = 10, height = 7, dpi = 320); p
+    geom_line(linewidth = .5) +
+    geom_point(size = 2) +
+    facet_grid(
+      rows = vars(k),
+      cols = vars(R0, p_sent),
+      labeller = label_both
+    ) +
+    scale_y_log10() +
+    labs(
+      x = NULL,
+      y = "95th percentile absolute log-likelihood error (log scale)",
+      title = "Likelihood accuracy across simulation regimes",
+      subtitle = "Reference fits must be independently checked for numerical stability"
+    ) +
+    theme_minimal(base_size = 11) +
+    theme(
+      legend.position = "none",
+      axis.text.x = element_text(angle = 35, hjust = 1)
+    )
+
+  ggsave(file, p, width = 14, height = 7, dpi = 320)
+  p
 }
 
 # ---------------- Experiment 2: published-data case study ----------------
 run_published_data <- function(csv_path, size_column = "chain_size",
-                               fixed_J = c(50L, 200L, 1000L), eps_ll = 1e-8) {
+                               fixed_J = c(50L, 200L, 1000L),
+                               eps_ll = 1e-8, n_rep = 3L) {
+
   dat <- read.csv(csv_path)
-  if (!size_column %in% names(dat)) stop("CSV must contain column: ", size_column)
+
+  if (!size_column %in% names(dat))
+    stop("CSV must contain column: ", size_column)
+
   y <- dat[[size_column]]
+
   if (!is.numeric(y) || anyNA(y) || any(y < 1) || any(y != floor(y)))
     stop("Chain sizes must be positive integer observations.")
-  # Reproducibility record: report source, data version, preprocessing, and N.
-  fits <- list(adaptive = fit_model(y, "adaptive", eps_ll = eps_ll,
-                                     max_n = 2e6L))
-  for (J in fixed_J) fits[[paste0("fixed_", J)]] <- fit_model(y, "fixed", J = J)
+
+  # Run each fit n_rep times and compute mean elapsed time
+  benchmark_fit <- function(...) {
+    times <- numeric(n_rep)
+    fits <- vector("list", n_rep)
+
+    for (i in seq_len(n_rep)) {
+      timing <- system.time(
+        fits[[i]] <- fit_model(...)
+      )
+      times[i] <- timing[["elapsed"]]
+    }
+
+    list(
+      fit = fits[[1]],
+      time = mean(times)
+    )
+  }
+
+  fits <- list(
+    adaptive = benchmark_fit(
+      y, "adaptive", eps_ll = eps_ll, max_n = 2e6L
+    ),
+    ref = benchmark_fit(
+      y, "adaptive", eps_ll = eps_ll / 1000, max_n = 2e6L
+    )
+  )
+
+  for (J in fixed_J) {
+    fits[[paste0("fixed_", J)]] <- benchmark_fit(
+      y, "fixed", J = J
+    )
+  }
+
   bind_rows(lapply(names(fits), function(nm) {
-    f <- fits[[nm]]; tibble(method = nm, R0 = as.numeric(f$R0), k = as.numeric(f$k),
-       p_sent = as.numeric(f$p), logLik = as.numeric(f$logLik),
-       convergence = as.integer(f$convergence))
-  })) %>% mutate(delta_logLik = logLik - logLik[method == "adaptive"][1])
+    f <- fits[[nm]]$fit
+
+    tibble(
+      method = nm,
+      R0 = as.numeric(f$R0),
+      k = as.numeric(f$k),
+      p_sent = as.numeric(f$p),
+      terms = as.numeric(f$terms),
+      logLik = as.numeric(f$logLik),
+      convergence = as.integer(f$convergence),
+      time = fits[[nm]]$time
+    )
+  })) %>%
+    mutate(
+      delta_logLik = logLik - logLik[method == "ref"][1]
+    )
 }
 
 plot_case_study <- function(case_tbl, file = "experiment2_cutoff_sensitivity.png") {
@@ -268,10 +322,3 @@ plot_case_study <- function(case_tbl, file = "experiment2_cutoff_sensitivity.png
       axis.text.x = element_text(angle = 35, hjust = 1))
   ggsave(file, p, width = 8, height = 5, dpi = 320); p
 }
-
-# ---------------- Results placeholders ----------------
-# After running and validating the code, save output tables/figures and fill in:
-# Experiment 1: [B, m, validated reference tolerance/cap], [key accuracy result],
-# [runtime/term-count result], [convergence/coverage result].
-# Experiment 2: [source/data preprocessing/N], [parameter estimates],
-# [likelihood differences], [runtime/terms], [sensitivity conclusion].
