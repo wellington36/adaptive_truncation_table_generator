@@ -15,5 +15,5 @@ us_results <- run_published_data(
 )
 
 
-head(canada_results)
-plot_case_study(canada_results)
+head(us_results)
+plot_case_study(us_results)

@@ -3,6 +3,22 @@ suppressPackageStartupMessages({
   library(progress)
 })
 
+# Stable log(exp(x) + exp(y)); handles -Inf inputs.
+logspace_add <- function(x, y) {
+  m <- pmax(x, y)
+  out <- m + log1p(exp(-abs(x - y)))
+  out[is.infinite(m) & m < 0] <- -Inf
+  out
+}
+
+# Stable log(sum(exp(x_i))).
+log_sum_exp <- function(x) {
+  if (!length(x)) return(-Inf)
+  m <- max(x)
+  if (is.infinite(m) && m < 0) return(-Inf)
+  m + log(sum(exp(x - m)))
+}
+
 # Stable log PMF of total progeny J for NB offspring.
 log_rj <- function(j, R0, k) {
   stopifnot(all(j >= 1), R0 > 0, k > 0)
@@ -10,63 +26,95 @@ log_rj <- function(j, R0, k) {
     (j - 1) * log(R0 / k) - ((k + 1) * j - 1) * log1p(R0 / k)
 }
 
-# Adaptive enclosure. n indexes the last included term; evaluate next ratio
-# from the exact pmf ratio. Returns an error if the cap is reached.
-adaptive_rho <- function(R0, k, p_sent, eps_ll = 1e-8, m = 1L, max_n = 1e6L) {
+# Adaptive enclosure. Consecutive terms are evaluated in vectorized batches to
+# reduce R-loop overhead during optimizer calls; returned n is the first tested
+# index meeting the tolerance. Tail and partial sums use log-domain arithmetic.
+adaptive_rho <- function(R0, k, p_sent, eps_ll = 1e-8, m = 1L,
+                         max_n = 1e6L, batch_size = 10L) {
   stopifnot(R0 > 0, k > 0, R0 < 1, p_sent > 0, p_sent < 1,
-            eps_ll > 0, m >= 1, max_n >= 2)
+            eps_ll > 0, m >= 1, max_n >= 2, batch_size >= 1)
   q <- 1 - p_sent
+  log_q <- log(q)
   n <- 1L
   log_r_n <- log_rj(1, R0, k)
   log_r_next <- log_rj(2, R0, k)
-
-  log_t <- log_r_n + log(q)
-  t_n <- exp(log_t)
-  S_n <- t_n
-
+  log_t_n <- log_r_n + log_q
+  log_S_n <- log_t_n
   L <- q * R0 * ((k + 1) / (k + R0))^(k + 1)
+  log_L <- log(L)
 
   repeat {
-    a_n <- exp(log(q) + log_r_next - log_r_n)
-
+    # Check the current index before advancing, so n is the first tested index
+    # at which the requested likelihood-scale tolerance is achieved.
+    a_n <- exp(log_q + log_r_next - log_r_n)
     if (!(a_n >= 0 && a_n < 1 && L >= a_n && L < 1))
       stop("Invalid ratio/bound; check arithmetic and model parameters.")
-
-    lo <- S_n + t_n * a_n / (1 - a_n)
-    hi <- S_n + t_n * L / (1 - L)
-
+    log_tail_lower <- log_t_n + log(a_n) - log1p(-a_n)
+    log_tail_upper <- log_t_n + log_L - log1p(-L)
+    lo <- exp(logspace_add(log_S_n, log_tail_lower))
+    hi <- exp(logspace_add(log_S_n, log_tail_upper))
     if (!(lo >= 0 && lo <= hi && is.finite(lo) && !is.na(hi)))
       stop("Invalid rho interval ordering; check arithmetic and model parameters.")
-
-    width_ll <- if (hi < 1)
-      m * (log1p(-lo) - log1p(-hi)) else Inf
-
+    width_ll <- if (hi < 1) m * (log1p(-lo) - log1p(-hi)) else Inf
     if (width_ll <= eps_ll)
-      return(list(lower = lo, upper = hi,
-                  midpoint = (lo + hi)/2,
-                  n = n, width_loglik = width_ll,
-                  converged = TRUE))
-
+      return(list(lower = lo, upper = hi, midpoint = (lo + hi)/2,
+                  n = n, width_loglik = width_ll, converged = TRUE))
     if (n >= max_n)
       stop("Maximum n reached before requested tolerance.")
 
-    # Add the previously evaluated next term.
-    tn1 <- exp(log_r_next + (n + 1) * log(q))
+    # Evaluate a block of future adjacent terms and ratios in vectorized lgamma calls.
+    b <- min(as.integer(batch_size), as.integer(max_n - n))
+    js <- n + seq_len(b)
+    log_r_batch <- log_rj(js, R0, k)
+    log_r_next_batch <- log_rj(js + 1L, R0, k)
+    log_t_batch <- log_r_batch + js * log_q
+    a_batch <- exp(log_q + log_r_next_batch - log_r_batch)
+    if (any(!is.finite(a_batch)) || any(a_batch < 0 | a_batch >= 1) ||
+        any(L < a_batch))
+      stop("Invalid ratio/bound; check arithmetic and model parameters.")
 
-    S_n <- S_n + tn1
-    t_n <- tn1
-    n <- n + 1L
+    # Compute partial sums through each candidate index with scaled cumulative sums.
+    mx <- max(log_t_batch)
+    log_additions <- mx + log(cumsum(exp(log_t_batch - mx)))
+    log_S_candidates <- logspace_add(log_S_n, log_additions)
+    log_tail_lower <- log_t_batch + log(a_batch) - log1p(-a_batch)
+    log_tail_upper <- log_t_batch + log_L - log1p(-L)
+    log_lo <- logspace_add(log_S_candidates, log_tail_lower)
+    log_hi <- logspace_add(log_S_candidates, log_tail_upper)
+    lo_batch <- exp(log_lo)
+    hi_batch <- exp(log_hi)
+    if (any(!is.finite(lo_batch)) || any(is.na(hi_batch)) ||
+        any(lo_batch < 0) || any(lo_batch > hi_batch))
+      stop("Invalid rho interval ordering; check arithmetic and model parameters.")
+    width_batch <- rep(Inf, length(hi_batch))
+    valid_hi <- hi_batch < 1
+    width_batch[valid_hi] <- m * (log1p(-lo_batch[valid_hi]) -
+                                  log1p(-hi_batch[valid_hi]))
+    hit <- which(width_batch <= eps_ll)
+    if (length(hit)) {
+      i <- hit[1]
+      return(list(lower = lo_batch[i], upper = hi_batch[i],
+                  midpoint = (lo_batch[i] + hi_batch[i])/2,
+                  n = as.integer(js[i]), width_loglik = width_batch[i],
+                  converged = TRUE))
+    }
 
-    # Advance the cached log-PMF values.
-    log_r_n <- log_r_next
-    log_r_next <- log_rj(n + 1, R0, k)
+    # Commit the whole block; all its terms are included in the new partial sum.
+    n <- as.integer(js[b])
+    log_S_n <- log_S_candidates[b]
+    log_t_n <- log_t_batch[b]
+    log_r_n <- log_r_batch[b]
+    log_r_next <- log_r_next_batch[b]
   }
 }
 
 # Fixed-cutoff approximation and observed log likelihood.
+# Positive series sums use log-sum-exp; the likelihood sums log contributions directly.
 rho_fixed <- function(R0, k, p_sent, J) {
-  j <- seq_len(J); q <- 1 - p_sent
-  sum(exp(log_rj(j, R0, k) + j * log(q)))
+  stopifnot(R0 > 0, k > 0, p_sent > 0, p_sent < 1, J >= 1)
+  j <- seq_len(J)
+  log_terms <- log_rj(j, R0, k) + j * log1p(-p_sent)
+  exp(log_sum_exp(log_terms))
 }
 
 loglik_observed <- function(y, R0, k, p_sent, method = c("adaptive", "fixed"),
@@ -81,6 +129,7 @@ loglik_observed <- function(y, R0, k, p_sent, method = c("adaptive", "fixed"),
   }
   if (!is.finite(rho) || rho >= 1) return(list(logLik = -Inf, terms = terms, width = width))
   q <- 1 - p_sent
+  # These are already logarithms of probabilities, so ordinary summation is correct.
   ll <- sum(log_rj(y, R0, k) + log1p(-q^y)) - m * log1p(-rho)
   list(logLik = ll, terms = terms, width = width)
 }
@@ -90,7 +139,9 @@ loglik_observed <- function(y, R0, k, p_sent, method = c("adaptive", "fixed"),
 sample_detected <- function(m, R0, k, p_sent, J = 200000L, seed = 1L) {
   set.seed(seed); j <- seq_len(J); q <- 1 - p_sent
   logw <- log_rj(j, R0, k) + log1p(-q^j)
-  w <- exp(logw - max(logw)); cdf <- cumsum(w) / sum(w)
+  # Normalize log weights using log-sum-exp, avoiding overflow/underflow.
+  log_norm <- log_sum_exp(logw)
+  w <- exp(logw - log_norm)
   # Require stable truncation under a larger J in final production use.
   sample(j, size = m, replace = TRUE, prob = w)
 }
@@ -141,7 +192,7 @@ fit_model <- function(y, method, J = 1000L, eps_ll = 1e-7, max_n = 1e6L,
 run_simulation <- function(B = 200L, m = 500L, seed = 42L,
                            eps_ll = 1e-7, fixed_J = c(50L, 200L, 1000L)) {
 
-  grid <- expand_grid(R0 = c(0.2, 0.5, 0.9), k = c(0.2, 1, 10),
+  grid <- expand_grid(R0 = c(0.5, 0.7, 0.9), k = c(0.1, 1, 10),
                       p_sent = c(.01, .1, .5))
 
   total_optim <- nrow(grid) * B * (2L + length(fixed_J))
@@ -150,7 +201,7 @@ run_simulation <- function(B = 200L, m = 500L, seed = 42L,
     format = "  Progress [:bar] :percent | :current/:total fits | Elapsed: :elapsed | ETA: :eta",
     total = total_optim,
     clear = TRUE,
-    width = 80
+    width = 65
   )
 
   map_dfr(seq_len(nrow(grid)), function(g) {
@@ -159,7 +210,6 @@ run_simulation <- function(B = 200L, m = 500L, seed = 42L,
     map_dfr(seq_len(B), function(b) {
       y <- sample_detected(m, pars$R0, pars$k, pars$p_sent,
                            seed = seed + 100000L*g + b)
-
       ref <- fit_model(y, "adaptive", eps_ll = eps_ll/1000,
                        max_n = 2e6L, progress_bar = pb)
 
