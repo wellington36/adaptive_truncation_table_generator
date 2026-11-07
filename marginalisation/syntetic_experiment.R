@@ -1,5 +1,6 @@
 suppressPackageStartupMessages({
-  library(dplyr); library(tibble); library(tidyr); library(progress)
+  library(dplyr); library(tibble); library(tidyr); library(progress);
+  library(ggplot2); library(scales); library(kableExtra)
 })
 
 # auxiliary functions
@@ -261,7 +262,7 @@ summarise_experiment1 <- function(res) {
 # ---------------- run ----------------
 res <- run_experiment1(
   grid = expand_grid(R0 = c(.5, .7, .9), k = c(.1, 1, 10), p_sent = c(.01, .1, .5)),
-  B = 5L, m = 500L,
+  B = 100L, m = 500L,
   adapt_eps = c(1e-4, 1e-7, 1e-10),
   fixed_J   = c(50L, 200L, 1000L))
 
