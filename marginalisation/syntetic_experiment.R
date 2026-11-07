@@ -1,6 +1,5 @@
 suppressPackageStartupMessages({
-  library(dplyr); library(tibble); library(tidyr); library(progress);
-  library(ggplot2); library(scales); library(kableExtra)
+  library(dplyr); library(tibble); library(tidyr); library(progress)
 })
 
 # auxiliary functions

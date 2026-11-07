@@ -1,3 +1,7 @@
+suppressPackageStartupMessages({
+  library(dplyr); library(tidyr); library(ggplot2); library(kableExtra)
+})
+
 # ---------------- plots ----------------
 lev <- c("fixed_50", "fixed_200", "fixed_1000",
          "adaptive_1e-04", "adaptive_1e-07", "adaptive_1e-10")
