@@ -2,7 +2,6 @@ suppressPackageStartupMessages({
   library(dplyr); library(tidyr); library(ggplot2); library(kableExtra)
 })
 
-# ---------------- plots ----------------
 lev <- c("fixed_50", "fixed_200", "fixed_1000",
          "adaptive_1e-04", "adaptive_1e-07", "adaptive_1e-10")
 lev <- lev[lev %in% unique(res$method)]
@@ -26,6 +25,8 @@ kable(tab_main, format = "latex", booktabs = TRUE, digits = 3,
       format.args = list(scientific = TRUE),
       caption = "Evaluation error and regret, pooled over the 27 regimes.")
 
+
+# Plotting numerical accuracy versus numbers of terms on optimisation step
 pal <- c(fixed_50 = "#d73027", fixed_200 = "#fc8d59", fixed_1000 = "#fdb863",
          `adaptive_1e-04` = "#9ecae1", `adaptive_1e-07` = "#4292c6",
          `adaptive_1e-10` = "#08306b")
@@ -79,7 +80,7 @@ for (kk in c(.1, 1, 10)) {
       strip.text = element_text(face = "bold")
     )
 
-  ggsave(sprintf("exp1_k%s.png", kk), p, width = 11, height = 7, dpi = 300)
+  ggsave(sprintf("figures/exp1_k%s.png", kk), p, width = 11, height = 7, dpi = 300)
 }
 
 grid27 <- expand_grid(R0 = c(.5, .7, .9), k = c(.1, 1, 10), p_sent = c(.01, .1, .5))
@@ -114,7 +115,7 @@ kable(wide, format = "latex", booktabs = TRUE, escape = FALSE, align = "llrrr",
       caption = "Terms needed by the adaptive rule ($\\varepsilon=10^{-10}$, $m=500$). Bold: more than 1000 terms.")
 
 p_it <- iter_tab %>%
-  ggplot(aes(factor(R0), factor(p_sent),
+  ggplot(aes(factor(R0), factor(p_sent, levels = sort(unique(p_sent), decreasing = TRUE)),
              fill = log10(n))) +
   geom_tile(colour = "white", linewidth = 1) +
   geom_text(
@@ -136,8 +137,7 @@ p_it <- iter_tab %>%
   scale_colour_identity() +
   labs(
     x = expression(R[0]),
-    y = expression(p[sent]),
-    title = "Terms required for error ≤ 1e-10"
+    y = expression(p[sent])
   ) +
   theme_minimal(base_size = 16) +
   theme(
@@ -147,9 +147,107 @@ p_it <- iter_tab %>%
   )
 
 ggsave(
-  "exp1_iterations.png",
+  "figures/exp1_iterations.png",
   p_it,
   width = 12,
-  height = 5,
+  height = 4.2,
   dpi = 300
 )
+
+bv_cells <- function(res) {
+  ref <- res %>%
+    distinct(R0, k, p_sent, rep, .keep_all = TRUE) %>%
+    transmute(R0, k, p_sent, rep, method = "reference",
+              est_R0 = ref_R0, est_k = ref_k, terms_total = NA_real_)
+
+  bind_rows(res %>% select(R0, k, p_sent, rep, method, est_R0, est_k, terms_total), ref) %>%
+    group_by(R0, k, p_sent, method) %>%
+    summarise(
+      bias_R0 = mean(est_R0 - R0),          # R0, k = TRUE grid values (group columns)
+      mcse_R0 = sd(est_R0) / sqrt(n()),     # Monte Carlo s.e. of the bias
+      var_R0  = var(est_R0),
+      bias_k  = mean(est_k - k),
+      mcse_k  = sd(est_k) / sqrt(n()),
+      var_k   = var(est_k),
+      terms   = median(terms_total, na.rm = TRUE),
+      .groups = "drop")
+}
+
+sm_bv <- bv_cells(res) %>%
+  mutate(family = ifelse(startsWith(method, "adaptive"), "adaptive",
+                  ifelse(method == "reference", "reference", "fixed")),
+         method = factor(method, c(lev, "reference")),
+         p_lab  = paste0("p_s = ", p_sent),
+         R0_lab = paste0("R0 = ", R0))
+
+# x-axis labels, in the order of `lev`
+lab_of <- function(m) {
+  m <- as.character(m)
+  ifelse(startsWith(m, "fixed_"),
+         paste0("J = ", sub("fixed_", "", m)),
+         paste0("\u03b5 = ", format(as.numeric(sub("adaptive_", "", m)), scientific = TRUE, digits = 1)))
+}
+
+plot_bv <- function(kk, par = c("R0", "k"), stat = c("bias", "var")) {
+  par <- match.arg(par); stat <- match.arg(stat)
+  ycol <- paste0(stat, "_", par)
+
+  d <- sm_bv %>%
+    filter(k == kk, family != "reference") %>%
+    mutate(method = factor(as.character(method), levels = lev),   # fixed first, then adaptive, coarse -> fine
+           y = .data[[ycol]])
+  r <- sm_bv %>% filter(k == kk, family == "reference") %>% mutate(y = .data[[ycol]])
+
+  p <- ggplot(d, aes(method, y))
+
+  if (stat == "bias") {
+    se <- d[[paste0("mcse_", par)]]
+    d$ymin <- d$y - 1.96 * se; d$ymax <- d$y + 1.96 * se
+    p <- p + geom_hline(yintercept = 0, colour = "grey50", linewidth = .4)
+  }
+
+  # dashed line = near-exact MLE (target for the approximations)
+  p <- p +
+    geom_hline(data = r, aes(yintercept = y), linetype = "dashed",
+               colour = "black", linewidth = .5) +
+    geom_line(aes(group = family, colour = family),
+              linewidth = 1.1, alpha = .55, show.legend = FALSE)
+
+  if (stat == "bias")
+    p <- p + geom_linerange(data = d, aes(ymin = ymin, ymax = ymax, colour = family),
+                            linewidth = .6, alpha = .6, show.legend = FALSE)
+
+  p <- p +
+    geom_point(aes(fill = method, shape = family),
+               size = 4.5, colour = "white", stroke = .8) +
+    facet_grid(p_lab ~ R0_lab, scales = "free_y") +
+    scale_x_discrete(labels = lab_of, drop = TRUE) +
+    scale_colour_manual(values = line_pal) +
+    scale_fill_manual(values = pal, breaks = lev, guide = "none") +
+    scale_shape_manual(values = c(fixed = 24, adaptive = 21), guide = "none") +
+    labs(x = NULL,
+         y = switch(paste(stat, par),
+                    "bias R0" = expression(paste("bias of ", hat(R)[0])),
+                    "var R0"  = expression(paste("variance of ", hat(R)[0])),
+                    "bias k"  = expression(paste("bias of ", hat(k))),
+                    "var k"   = expression(paste("variance of ", hat(k)))),
+         title = paste0("k = ", kk)) +
+    theme_minimal(base_size = 21) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 13),
+          panel.grid.minor = element_blank(),
+          panel.spacing = unit(0.1, "cm"),
+          strip.text = element_text(face = "bold"))
+
+  if (stat == "var")
+    p <- p + scale_y_log10(
+      breaks = scales::trans_breaks("log10", function(x) 10^x),
+      labels = scales::trans_format("log10", scales::math_format(10^.x)))
+  p
+}
+
+dir.create("figures", showWarnings = FALSE)
+for (kk in c(.1, 1, 10))
+  for (par in c("R0", "k"))
+    for (stat in c("bias", "var"))
+      ggsave(sprintf("figures/exp1_%s_%s_k%s.png", stat, par, kk),
+             plot_bv(kk, par, stat), width = 11, height = 8, dpi = 300)
